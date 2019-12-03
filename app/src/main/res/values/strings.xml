@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">TCore</string>
+    <string name="title_home">介绍</string>
+    <string name="title_dashboard">API</string>
+    <string name="title_notifications">更多</string>
+    <string name="title_activity_demo">ActivityDemo</string>
+    <string name="title_activity_adapt_demo">AdaptDemo</string>
+    <string name="title_activity_app_demo">AppDemo</string>
+    <string name="title_activity_vibrate_demo">VibrateDemo</string>
+    <string name="tips_vibrate">如果要使用震动功能需要在AndroidManifest.xml文件中添加如下权限\n \"android.permission.VIBRATE\"</string>
+</resources>

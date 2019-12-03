@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context=".ui.demo.VibrateDemoActivity"
+    tools:showIn="@layout/activity_vibrate_demo">
+
+    <TextView
+        android:id="@+id/tv_vibrate_tips"
+        style="@style/codeTextStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:text="@string/tips_vibrate"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/btn_vibrate_default"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:text="震动1s"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_vibrate_tips" />
+
+    <TextView
+        android:id="@+id/tv_default"
+        style="@style/codeTextStyle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text=" VibrateUtils.vibrate(1000);"
+
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btn_vibrate_default" />
+
+    <Button
+        android:id="@+id/btn_vibrate_custom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="自定义震动"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_default" />
+
+    <TextView
+        android:id="@+id/tv_custom"
+        style="@style/codeTextStyle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="VibrateUtils.vibrate(new long[]{0,100,2000,100},1);\n第一个数组参数中第一个不震动时长，第二个是震动时长；第二个参数为【-1】时不重复，其他值为重复"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btn_vibrate_custom" />
+
+    <Button
+        android:id="@+id/btn_vibrate_cancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="取消震动"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_custom" />
+
+    <TextView
+        android:id="@+id/tv_cancel"
+        style="@style/codeTextStyle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="VibrateUtils.cancel();"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btn_vibrate_cancel" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/group_code"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:constraint_referenced_ids="tv_cancel,tv_custom,tv_default"/>
+</androidx.constraintlayout.widget.ConstraintLayout>
