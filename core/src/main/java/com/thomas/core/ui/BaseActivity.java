@@ -38,6 +38,7 @@ public abstract class BaseActivity extends AppCompatActivity implements IBaseVie
         initData(getIntent().getExtras());
         setContentView();
         initView(savedInstanceState, mContentView);
+        doBusiness();
     }
 
     public void initStatusBar() {
@@ -51,11 +52,6 @@ public abstract class BaseActivity extends AppCompatActivity implements IBaseVie
                 BarUtils.setNavBarColor(this, ContextCompat.getColor(this, android.R.color.black));
             }
         }
-    }
-
-    @Override
-    public void onAttachedToWindow() {
-        doBusiness();
     }
 
     /**
