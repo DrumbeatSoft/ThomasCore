@@ -9,10 +9,10 @@ import android.os.Build;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 
+import androidx.annotation.RequiresPermission;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-
-import androidx.annotation.RequiresPermission;
 
 import static android.Manifest.permission.CALL_PHONE;
 import static android.Manifest.permission.READ_PHONE_STATE;

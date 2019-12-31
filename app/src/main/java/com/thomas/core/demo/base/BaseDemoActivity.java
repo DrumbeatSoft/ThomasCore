@@ -1,11 +1,7 @@
 package com.thomas.core.demo.base;
 
-import android.os.Bundle;
 import android.view.MenuItem;
-import android.view.View;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 
 import com.thomas.core.demo.R;

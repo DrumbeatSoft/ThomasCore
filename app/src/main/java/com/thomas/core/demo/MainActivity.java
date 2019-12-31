@@ -3,19 +3,16 @@ package com.thomas.core.demo;
 import android.os.Bundle;
 import android.view.View;
 
-import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.thomas.core.demo.base.BaseDemoActivity;
-import com.thomas.core.ui.BaseActivity;
-import com.thomas.core.utils.BarUtils;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
-import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
+
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.thomas.core.demo.base.BaseDemoActivity;
+import com.thomas.core.utils.BarUtils;
 
 public class MainActivity extends BaseDemoActivity {
     private BottomNavigationView navView;

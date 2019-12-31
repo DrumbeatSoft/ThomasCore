@@ -1,11 +1,5 @@
 package com.thomas.core.demo.base;
 
-import android.os.Bundle;
-import android.view.View;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
 import com.thomas.core.ui.BaseFragment;
 
 /**

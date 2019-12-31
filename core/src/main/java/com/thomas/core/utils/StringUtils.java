@@ -1,6 +1,7 @@
 package com.thomas.core.utils;
 
 import android.content.res.Resources;
+
 import androidx.annotation.ArrayRes;
 import androidx.annotation.StringRes;
 /**

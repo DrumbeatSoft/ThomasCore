@@ -2,7 +2,6 @@ package com.thomas.core.utils;
 
 import androidx.collection.SimpleArrayMap;
 
-
 import com.thomas.core.constant.RegexConstants;
 
 import java.util.ArrayList;

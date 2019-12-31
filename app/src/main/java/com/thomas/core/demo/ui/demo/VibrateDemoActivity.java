@@ -8,8 +8,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.Group;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 import com.thomas.core.demo.R;
 import com.thomas.core.demo.base.BaseDemoActivity;
 import com.thomas.core.utils.BarUtils;

@@ -2,6 +2,7 @@ package com.thomas.core.utils;
 
 import android.content.Context;
 import android.os.Vibrator;
+
 import androidx.annotation.RequiresPermission;
 
 import static android.Manifest.permission.VIBRATE;

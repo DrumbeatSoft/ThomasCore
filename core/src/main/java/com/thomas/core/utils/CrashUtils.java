@@ -6,14 +6,14 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Environment;
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresPermission;
-import android.util.Log;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.lang.Thread.UncaughtExceptionHandler;

@@ -3,7 +3,6 @@ package com.thomas.core.ui;
 import android.os.Bundle;
 import android.view.View;
 
-import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 

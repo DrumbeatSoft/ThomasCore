@@ -1,6 +1,6 @@
 package com.thomas.core.utils;
-import androidx.annotation.NonNull;
 
+import androidx.annotation.NonNull;
 
 import com.thomas.core.constant.TimeConstants;
 
