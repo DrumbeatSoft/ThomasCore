@@ -6,6 +6,7 @@ import android.os.Vibrator;
 import androidx.annotation.RequiresPermission;
 
 import static android.Manifest.permission.VIBRATE;
+
 /**
  * @author Thomas
  * @describe 震动工具类
@@ -29,7 +30,9 @@ public final class VibrateUtils {
     @RequiresPermission(VIBRATE)
     public static void vibrate(final long milliseconds) {
         Vibrator vibrator = getVibrator();
-        if (vibrator == null){ return;}
+        if (vibrator == null) {
+            return;
+        }
         vibrator.vibrate(milliseconds);
     }
 
@@ -43,7 +46,9 @@ public final class VibrateUtils {
     @RequiresPermission(VIBRATE)
     public static void vibrate(final long[] pattern, final int repeat) {
         Vibrator vibrator = getVibrator();
-        if (vibrator == null) {return;}
+        if (vibrator == null) {
+            return;
+        }
         vibrator.vibrate(pattern, repeat);
     }
 
@@ -54,7 +59,9 @@ public final class VibrateUtils {
     @RequiresPermission(VIBRATE)
     public static void cancel() {
         Vibrator vibrator = getVibrator();
-        if (vibrator == null) {return;}
+        if (vibrator == null) {
+            return;
+        }
         vibrator.cancel();
     }
 

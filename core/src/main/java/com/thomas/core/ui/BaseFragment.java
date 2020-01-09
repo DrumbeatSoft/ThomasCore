@@ -24,13 +24,10 @@ import com.thomas.core.utils.ClickUtils;
  */
 public abstract class BaseFragment extends Fragment implements IBaseView {
     private static final String STATE_SAVE_IS_HIDDEN = "STATE_SAVE_IS_HIDDEN";
-
-    private View.OnClickListener mClickListener = v -> onThomasClick(v);
-
     protected AppCompatActivity mActivity;
     protected LayoutInflater mInflater;
     protected View mContentView;
-
+    private View.OnClickListener mClickListener = v -> onThomasClick(v);
 
     @Override
     public void onAttach(Context context) {

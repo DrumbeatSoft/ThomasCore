@@ -26,20 +26,20 @@ import androidx.core.view.ViewCompat;
  * @since 1.0.0
  */
 public class ClickUtils {
-    private static final int   PRESSED_VIEW_SCALE_TAG           = -1;
+    private static final int PRESSED_VIEW_SCALE_TAG = -1;
     private static final float PRESSED_VIEW_SCALE_DEFAULT_VALUE = -0.06f;
 
-    private static final int   PRESSED_VIEW_ALPHA_TAG           = -2;
-    private static final int   PRESSED_VIEW_ALPHA_SRC_TAG       = -3;
+    private static final int PRESSED_VIEW_ALPHA_TAG = -2;
+    private static final int PRESSED_VIEW_ALPHA_SRC_TAG = -3;
     private static final float PRESSED_VIEW_ALPHA_DEFAULT_VALUE = 0.8f;
 
-    private static final int   PRESSED_BG_ALPHA_STYLE         = 4;
+    private static final int PRESSED_BG_ALPHA_STYLE = 4;
     private static final float PRESSED_BG_ALPHA_DEFAULT_VALUE = 0.9f;
 
-    private static final int   PRESSED_BG_DARK_STYLE         = 5;
+    private static final int PRESSED_BG_DARK_STYLE = 5;
     private static final float PRESSED_BG_DARK_DEFAULT_VALUE = 0.9f;
 
-    private static final int  DEBOUNCING_TAG           = -7;
+    private static final int DEBOUNCING_TAG = -7;
     private static final long DEBOUNCING_DEFAULT_VALUE = 200;
 
     private ClickUtils() {
@@ -364,23 +364,8 @@ public class ClickUtils {
                 mEnabled = true;
             }
         };
-
-        private static boolean isValid(@NonNull final View view, final long duration) {
-            long curTime = System.currentTimeMillis();
-            Object tag = view.getTag(DEBOUNCING_TAG);
-            if (!(tag instanceof Long)) {
-                view.setTag(DEBOUNCING_TAG, curTime);
-                return true;
-            }
-            long preTime = (Long) tag;
-            if (curTime - preTime <= duration) return false;
-            view.setTag(DEBOUNCING_TAG, curTime);
-            return true;
-        }
-
-        private long    mDuration;
+        private long mDuration;
         private boolean mIsGlobal;
-
         public OnDebouncingClickListener() {
             this(true, DEBOUNCING_DEFAULT_VALUE);
         }
@@ -396,6 +381,19 @@ public class ClickUtils {
         public OnDebouncingClickListener(final boolean isGlobal, final long duration) {
             mIsGlobal = isGlobal;
             mDuration = duration;
+        }
+
+        private static boolean isValid(@NonNull final View view, final long duration) {
+            long curTime = System.currentTimeMillis();
+            Object tag = view.getTag(DEBOUNCING_TAG);
+            if (!(tag instanceof Long)) {
+                view.setTag(DEBOUNCING_TAG, curTime);
+                return true;
+            }
+            long preTime = (Long) tag;
+            if (curTime - preTime <= duration) return false;
+            view.setTag(DEBOUNCING_TAG, curTime);
+            return true;
         }
 
         public abstract void onDebouncingClick(View v);
@@ -420,11 +418,11 @@ public class ClickUtils {
 
         private static final long INTERVAL_DEFAULT_VALUE = 666;
 
-        private final int  mTriggerClickCount;
+        private final int mTriggerClickCount;
         private final long mClickInterval;
 
         private long mLastClickTime;
-        private int  mClickCount;
+        private int mClickCount;
 
         public OnMultiClickListener(int triggerClickCount) {
             this(triggerClickCount, INTERVAL_DEFAULT_VALUE);
@@ -467,11 +465,11 @@ public class ClickUtils {
 
     private static class OnUtilsTouchListener implements View.OnTouchListener {
 
+        private OnUtilsTouchListener() {/**/}
+
         public static OnUtilsTouchListener getInstance() {
             return LazyHolder.INSTANCE;
         }
-
-        private OnUtilsTouchListener() {/**/}
 
         @Override
         public boolean onTouch(final View v, MotionEvent event) {

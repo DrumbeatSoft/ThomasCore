@@ -1,4 +1,5 @@
 package com.thomas.core.utils;
+
 import android.os.Build;
 import android.text.Html;
 import android.util.Base64;
@@ -6,6 +7,7 @@ import android.util.Base64;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+
 /**
  * @author Thomas
  * @describe 编码工具类
@@ -36,7 +38,9 @@ public final class EncodeUtils {
      * @return the urlencoded string
      */
     public static String urlEncode(final String input, final String charsetName) {
-        if (input == null || input.length() == 0) {return "";}
+        if (input == null || input.length() == 0) {
+            return "";
+        }
         try {
             return URLEncoder.encode(input, charsetName);
         } catch (UnsupportedEncodingException e) {
@@ -62,7 +66,9 @@ public final class EncodeUtils {
      * @return the string of decode urlencoded string
      */
     public static String urlDecode(final String input, final String charsetName) {
-        if (input == null || input.length() == 0) {return "";}
+        if (input == null || input.length() == 0) {
+            return "";
+        }
         try {
             String safeInput = input.replaceAll("%(?![0-9a-fA-F]{2})", "%25").replaceAll("\\+", "%2B");
             return URLDecoder.decode(safeInput, charsetName);
@@ -88,7 +94,9 @@ public final class EncodeUtils {
      * @return Base64-encode bytes
      */
     public static byte[] base64Encode(final byte[] input) {
-        if (input == null || input.length == 0) {return new byte[0];}
+        if (input == null || input.length == 0) {
+            return new byte[0];
+        }
         return Base64.encode(input, Base64.NO_WRAP);
     }
 
@@ -99,7 +107,9 @@ public final class EncodeUtils {
      * @return Base64-encode string
      */
     public static String base64Encode2String(final byte[] input) {
-        if (input == null || input.length == 0) {return "";}
+        if (input == null || input.length == 0) {
+            return "";
+        }
         return Base64.encodeToString(input, Base64.NO_WRAP);
     }
 
@@ -110,7 +120,9 @@ public final class EncodeUtils {
      * @return the string of decode Base64-encode string
      */
     public static byte[] base64Decode(final String input) {
-        if (input == null || input.length() == 0) {return new byte[0];}
+        if (input == null || input.length() == 0) {
+            return new byte[0];
+        }
         return Base64.decode(input, Base64.NO_WRAP);
     }
 
@@ -121,7 +133,9 @@ public final class EncodeUtils {
      * @return the bytes of decode Base64-encode bytes
      */
     public static byte[] base64Decode(final byte[] input) {
-        if (input == null || input.length == 0) {return new byte[0];}
+        if (input == null || input.length == 0) {
+            return new byte[0];
+        }
         return Base64.decode(input, Base64.NO_WRAP);
     }
 
@@ -132,7 +146,9 @@ public final class EncodeUtils {
      * @return html-encode string
      */
     public static String htmlEncode(final CharSequence input) {
-        if (input == null || input.length() == 0) {return "";}
+        if (input == null || input.length() == 0) {
+            return "";
+        }
         StringBuilder sb = new StringBuilder();
         char c;
         for (int i = 0, len = input.length(); i < len; i++) {
@@ -173,7 +189,9 @@ public final class EncodeUtils {
      */
     @SuppressWarnings("deprecation")
     public static CharSequence htmlDecode(final String input) {
-        if (input == null || input.length() == 0) {return "";}
+        if (input == null || input.length() == 0) {
+            return "";
+        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             return Html.fromHtml(input, Html.FROM_HTML_MODE_LEGACY);
         } else {

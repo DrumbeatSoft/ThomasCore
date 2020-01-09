@@ -158,24 +158,6 @@ public final class ScreenUtils {
     }
 
     /**
-     * Set the screen to landscape.
-     *
-     * @param activity The activity.
-     */
-    public static void setLandscape(@NonNull final Activity activity) {
-        activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-    }
-
-    /**
-     * Set the screen to portrait.
-     *
-     * @param activity The activity.
-     */
-    public static void setPortrait(@NonNull final Activity activity) {
-        activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-    }
-
-    /**
      * Return whether screen is landscape.
      *
      * @return {@code true}: yes<br>{@code false}: no
@@ -186,6 +168,15 @@ public final class ScreenUtils {
     }
 
     /**
+     * Set the screen to landscape.
+     *
+     * @param activity The activity.
+     */
+    public static void setLandscape(@NonNull final Activity activity) {
+        activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+    }
+
+    /**
      * Return whether screen is portrait.
      *
      * @return {@code true}: yes<br>{@code false}: no
@@ -193,6 +184,15 @@ public final class ScreenUtils {
     public static boolean isPortrait() {
         return Utils.getApp().getResources().getConfiguration().orientation
                 == Configuration.ORIENTATION_PORTRAIT;
+    }
+
+    /**
+     * Set the screen to portrait.
+     *
+     * @param activity The activity.
+     */
+    public static void setPortrait(@NonNull final Activity activity) {
+        activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
     }
 
     /**
@@ -284,21 +284,6 @@ public final class ScreenUtils {
     }
 
     /**
-     * Set the duration of sleep.
-     * <p>Must hold {@code <uses-permission android:name="android.permission.WRITE_SETTINGS" />}</p>
-     *
-     * @param duration The duration.
-     */
-    @RequiresPermission(WRITE_SETTINGS)
-    public static void setSleepDuration(final int duration) {
-        Settings.System.putInt(
-                Utils.getApp().getContentResolver(),
-                Settings.System.SCREEN_OFF_TIMEOUT,
-                duration
-        );
-    }
-
-    /**
      * Return the duration of sleep.
      *
      * @return the duration of sleep.
@@ -313,5 +298,20 @@ public final class ScreenUtils {
             e.printStackTrace();
             return -123;
         }
+    }
+
+    /**
+     * Set the duration of sleep.
+     * <p>Must hold {@code <uses-permission android:name="android.permission.WRITE_SETTINGS" />}</p>
+     *
+     * @param duration The duration.
+     */
+    @RequiresPermission(WRITE_SETTINGS)
+    public static void setSleepDuration(final int duration) {
+        Settings.System.putInt(
+                Utils.getApp().getContentResolver(),
+                Settings.System.SCREEN_OFF_TIMEOUT,
+                duration
+        );
     }
 }

@@ -83,7 +83,9 @@ public class ArrayUtils {
      * @return the size of array
      */
     public static int getLength(Object array) {
-        if (array == null) {return 0;}
+        if (array == null) {
+            return 0;
+        }
         return Array.getLength(array);
     }
 
@@ -111,7 +113,9 @@ public class ArrayUtils {
      * @return the value of the specified index of the array
      */
     public static Object get(Object array, int index, Object defaultValue) {
-        if (array == null) {return defaultValue;}
+        if (array == null) {
+            return defaultValue;
+        }
         try {
             return Array.get(array, index);
         } catch (Exception ignore) {
@@ -127,7 +131,9 @@ public class ArrayUtils {
      * @param value The new value of the indexed component.
      */
     public static void set(Object array, int index, Object value) {
-        if (array == null) {return;}
+        if (array == null) {
+            return;
+        }
         Array.set(array, index, value);
     }
 
@@ -344,52 +350,72 @@ public class ArrayUtils {
      * @return the cloned array, <code>null</code> if <code>null</code> input
      */
     public static <T> T[] copy(T[] array) {
-        if (array == null) {return null;}
+        if (array == null) {
+            return null;
+        }
         return subArray(array, 0, array.length);
     }
 
     public static long[] copy(long[] array) {
-        if (array == null) {return null;}
+        if (array == null) {
+            return null;
+        }
         return subArray(array, 0, array.length);
     }
 
     public static int[] copy(int[] array) {
-        if (array == null) {return null;}
+        if (array == null) {
+            return null;
+        }
         return subArray(array, 0, array.length);
     }
 
     public static short[] copy(short[] array) {
-        if (array == null) {return null;}
+        if (array == null) {
+            return null;
+        }
         return subArray(array, 0, array.length);
     }
 
     public static char[] copy(char[] array) {
-        if (array == null) {return null;}
+        if (array == null) {
+            return null;
+        }
         return subArray(array, 0, array.length);
     }
 
     public static byte[] copy(byte[] array) {
-        if (array == null) {return null;}
+        if (array == null) {
+            return null;
+        }
         return subArray(array, 0, array.length);
     }
 
     public static double[] copy(double[] array) {
-        if (array == null) {return null;}
+        if (array == null) {
+            return null;
+        }
         return subArray(array, 0, array.length);
     }
 
     public static float[] copy(float[] array) {
-        if (array == null) {return null;}
+        if (array == null) {
+            return null;
+        }
         return subArray(array, 0, array.length);
     }
 
     public static boolean[] copy(boolean[] array) {
-        if (array == null) {return null;}
+        if (array == null) {
+            return null;
+        }
         return subArray(array, 0, array.length);
     }
 
     private static Object realCopy(Object array) {
-        if (array == null) {return null;}
+        if (array == null) {
+            return null;
+        }
         return realSubArray(array, 0, getLength(array));
     }
 
@@ -589,7 +615,9 @@ public class ArrayUtils {
     }
 
     private static Object realAddArr(Object array1, Object array2) {
-        if (array1 == null && array2 == null){ return null;}
+        if (array1 == null && array2 == null) {
+            return null;
+        }
         if (array1 == null) {
             return realCopy(array2);
         }
@@ -677,7 +705,9 @@ public class ArrayUtils {
     }
 
     private static Object realAddArr(Object array1, int index, Object array2, Class clss) {
-        if (array1 == null && array2 == null) {return null;}
+        if (array1 == null && array2 == null) {
+            return null;
+        }
         int len1 = getLength(array1);
         int len2 = getLength(array2);
         if (len1 == 0) {
@@ -1842,55 +1872,75 @@ public class ArrayUtils {
 
     public static <T> List<T> asArrayList(T... array) {
         List<T> list = new ArrayList<>();
-        if (array == null || array.length == 0){ return list;}
+        if (array == null || array.length == 0) {
+            return list;
+        }
         list.addAll(Arrays.asList(array));
         return list;
     }
 
     public static <T> List<T> asLinkedList(T... array) {
         List<T> list = new LinkedList<>();
-        if (array == null || array.length == 0){ return list;}
+        if (array == null || array.length == 0) {
+            return list;
+        }
         list.addAll(Arrays.asList(array));
         return list;
     }
 
     public static <T> void sort(T[] array, Comparator<? super T> c) {
-        if (array == null || array.length < 2){ return;}
+        if (array == null || array.length < 2) {
+            return;
+        }
         Arrays.sort(array, c);
     }
 
     public static void sort(byte[] array) {
-        if (array == null || array.length < 2){ return;}
+        if (array == null || array.length < 2) {
+            return;
+        }
         Arrays.sort(array);
     }
 
     public static void sort(char[] array) {
-        if (array == null || array.length < 2){ return;}
+        if (array == null || array.length < 2) {
+            return;
+        }
         Arrays.sort(array);
     }
 
     public static void sort(double[] array) {
-        if (array == null || array.length < 2) {return;}
+        if (array == null || array.length < 2) {
+            return;
+        }
         Arrays.sort(array);
     }
 
     public static void sort(float[] array) {
-        if (array == null || array.length < 2) {return;}
+        if (array == null || array.length < 2) {
+            return;
+        }
         Arrays.sort(array);
     }
 
     public static void sort(int[] array) {
-        if (array == null || array.length < 2) {return;}
+        if (array == null || array.length < 2) {
+            return;
+        }
         Arrays.sort(array);
     }
 
     public static void sort(long[] array) {
-        if (array == null || array.length < 2){ return;}
+        if (array == null || array.length < 2) {
+            return;
+        }
         Arrays.sort(array);
     }
 
     public static void sort(short[] array) {
-        if (array == null || array.length < 2){ return;}
+        if (array == null || array.length < 2) {
+            return;
+        }
         Arrays.sort(array);
     }
 
@@ -1903,7 +1953,9 @@ public class ArrayUtils {
      * @param closure the closure to perform, may be null
      */
     public static <E> void forAllDo(Object array, Closure<E> closure) {
-        if (array == null || closure == null) {return;}
+        if (array == null || closure == null) {
+            return;
+        }
         if (array instanceof Object[]) {
             Object[] objects = (Object[]) array;
             for (int i = 0, length = objects.length; i < length; i++) {
@@ -1970,7 +2022,9 @@ public class ArrayUtils {
      * @return the string of array
      */
     public static String toString(Object array) {
-        if (array == null){ return "null";}
+        if (array == null) {
+            return "null";
+        }
         if (array instanceof Object[]) {
             return Arrays.deepToString((Object[]) array);
         } else if (array instanceof boolean[]) {

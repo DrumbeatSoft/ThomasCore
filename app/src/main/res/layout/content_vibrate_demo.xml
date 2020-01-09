@@ -88,5 +88,5 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:visibility="gone"
-        app:constraint_referenced_ids="tv_cancel,tv_custom,tv_default"/>
+        app:constraint_referenced_ids="tv_cancel,tv_custom,tv_default" />
 </androidx.constraintlayout.widget.ConstraintLayout>

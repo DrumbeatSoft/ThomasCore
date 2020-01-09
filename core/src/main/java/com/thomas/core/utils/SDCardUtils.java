@@ -10,6 +10,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+
 /**
  * @author Thomas
  * @describe sd卡工具类
@@ -123,8 +124,8 @@ public final class SDCardUtils {
 
     public static class SDCardInfo {
 
-        private String  path;
-        private String  state;
+        private String path;
+        private String state;
         private boolean isRemovable;
 
         SDCardInfo(String path, String state, boolean isRemovable) {

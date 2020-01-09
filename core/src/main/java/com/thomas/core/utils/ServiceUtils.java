@@ -1,4 +1,5 @@
 package com.thomas.core.utils;
+
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningServiceInfo;
 import android.content.Context;
@@ -8,6 +9,7 @@ import android.content.ServiceConnection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
 /**
  * @author Thomas
  * @describe 服务工具类

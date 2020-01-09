@@ -30,8 +30,8 @@ public class MainActivity extends BaseDemoActivity {
     @Override
     public void initStatusBar() {
         super.initStatusBar();
-        BarUtils.setStatusBarLightMode(mActivity,true);
-        BarUtils.setStatusBarColor(this, ContextCompat.getColor(mActivity,android.R.color.background_light),true);
+        BarUtils.setStatusBarLightMode(mActivity, true);
+        BarUtils.setStatusBarColor(this, ContextCompat.getColor(mActivity, android.R.color.background_light), true);
     }
 
     @Override

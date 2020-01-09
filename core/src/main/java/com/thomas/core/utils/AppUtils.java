@@ -38,6 +38,9 @@ import java.util.List;
  * @since 1.0.0
  */
 public final class AppUtils {
+    private static final char[] HEX_DIGITS =
+            {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+
     private AppUtils() {
         throw new UnsupportedOperationException("u can't instantiate me...");
     }
@@ -637,7 +640,6 @@ public final class AppUtils {
         return getAppSignatureHash(packageName, "MD5");
     }
 
-
     /**
      * Return the application's user-ID.
      *
@@ -775,100 +777,6 @@ public final class AppUtils {
         return new AppInfo(packageName, name, icon, packagePath, versionName, versionCode, isSystem);
     }
 
-    /**
-     * The application's information.
-     */
-    public static class AppInfo {
-
-        private String   packageName;
-        private String   name;
-        private Drawable icon;
-        private String   packagePath;
-        private String   versionName;
-        private int      versionCode;
-        private boolean  isSystem;
-
-        public Drawable getIcon() {
-            return icon;
-        }
-
-        public void setIcon(final Drawable icon) {
-            this.icon = icon;
-        }
-
-        public boolean isSystem() {
-            return isSystem;
-        }
-
-        public void setSystem(final boolean isSystem) {
-            this.isSystem = isSystem;
-        }
-
-        public String getPackageName() {
-            return packageName;
-        }
-
-        public void setPackageName(final String packageName) {
-            this.packageName = packageName;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public void setName(final String name) {
-            this.name = name;
-        }
-
-        public String getPackagePath() {
-            return packagePath;
-        }
-
-        public void setPackagePath(final String packagePath) {
-            this.packagePath = packagePath;
-        }
-
-        public int getVersionCode() {
-            return versionCode;
-        }
-
-        public void setVersionCode(final int versionCode) {
-            this.versionCode = versionCode;
-        }
-
-        public String getVersionName() {
-            return versionName;
-        }
-
-        public void setVersionName(final String versionName) {
-            this.versionName = versionName;
-        }
-
-        public AppInfo(String packageName, String name, Drawable icon, String packagePath,
-                       String versionName, int versionCode, boolean isSystem) {
-            this.setName(name);
-            this.setIcon(icon);
-            this.setPackageName(packageName);
-            this.setPackagePath(packagePath);
-            this.setVersionName(versionName);
-            this.setVersionCode(versionCode);
-            this.setSystem(isSystem);
-        }
-
-        @Override
-        public String toString() {
-            return "{" +
-                    "\n    pkg name: " + getPackageName() +
-                    "\n    app icon: " + getIcon() +
-                    "\n    app name: " + getName() +
-                    "\n    app path: " + getPackagePath() +
-                    "\n    app v name: " + getVersionName() +
-                    "\n    app v code: " + getVersionCode() +
-                    "\n    is system: " + isSystem() +
-                    "\n}";
-        }
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     // other utils methods
     ///////////////////////////////////////////////////////////////////////////
@@ -890,9 +798,6 @@ public final class AppUtils {
         }
         return true;
     }
-
-    private static final char[] HEX_DIGITS =
-            {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
 
     private static byte[] hashTemplate(final byte[] data, final String algorithm) {
         if (data == null || data.length <= 0) return null;
@@ -1046,5 +951,99 @@ public final class AppUtils {
             }
         }
         return "";
+    }
+
+    /**
+     * The application's information.
+     */
+    public static class AppInfo {
+
+        private String packageName;
+        private String name;
+        private Drawable icon;
+        private String packagePath;
+        private String versionName;
+        private int versionCode;
+        private boolean isSystem;
+
+        public AppInfo(String packageName, String name, Drawable icon, String packagePath,
+                       String versionName, int versionCode, boolean isSystem) {
+            this.setName(name);
+            this.setIcon(icon);
+            this.setPackageName(packageName);
+            this.setPackagePath(packagePath);
+            this.setVersionName(versionName);
+            this.setVersionCode(versionCode);
+            this.setSystem(isSystem);
+        }
+
+        public Drawable getIcon() {
+            return icon;
+        }
+
+        public void setIcon(final Drawable icon) {
+            this.icon = icon;
+        }
+
+        public boolean isSystem() {
+            return isSystem;
+        }
+
+        public void setSystem(final boolean isSystem) {
+            this.isSystem = isSystem;
+        }
+
+        public String getPackageName() {
+            return packageName;
+        }
+
+        public void setPackageName(final String packageName) {
+            this.packageName = packageName;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(final String name) {
+            this.name = name;
+        }
+
+        public String getPackagePath() {
+            return packagePath;
+        }
+
+        public void setPackagePath(final String packagePath) {
+            this.packagePath = packagePath;
+        }
+
+        public int getVersionCode() {
+            return versionCode;
+        }
+
+        public void setVersionCode(final int versionCode) {
+            this.versionCode = versionCode;
+        }
+
+        public String getVersionName() {
+            return versionName;
+        }
+
+        public void setVersionName(final String versionName) {
+            this.versionName = versionName;
+        }
+
+        @Override
+        public String toString() {
+            return "{" +
+                    "\n    pkg name: " + getPackageName() +
+                    "\n    app icon: " + getIcon() +
+                    "\n    app name: " + getName() +
+                    "\n    app path: " + getPackagePath() +
+                    "\n    app v name: " + getVersionName() +
+                    "\n    app v code: " + getVersionCode() +
+                    "\n    is system: " + isSystem() +
+                    "\n}";
+        }
     }
 }

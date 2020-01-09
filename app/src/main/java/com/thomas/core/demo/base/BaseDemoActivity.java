@@ -41,14 +41,14 @@ public abstract class BaseDemoActivity extends BaseActivity {
     @Override
     public void initStatusBar() {
         super.initStatusBar();
-        BarUtils.setStatusBarLightMode(mActivity,true);
-        BarUtils.setStatusBarColor(this, ContextCompat.getColor(mActivity, R.color.colorPrimary),true);
+        BarUtils.setStatusBarLightMode(mActivity, true);
+        BarUtils.setStatusBarColor(this, ContextCompat.getColor(mActivity, R.color.colorPrimary), true);
 
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(item.getItemId() == android.R.id.home){
+        if (item.getItemId() == android.R.id.home) {
             ActivityUtils.finishActivity(mActivity);
         }
         return super.onOptionsItemSelected(item);

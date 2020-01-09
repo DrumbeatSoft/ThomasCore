@@ -1,4 +1,5 @@
 package com.thomas.core.utils;
+
 import android.graphics.drawable.Drawable;
 
 import androidx.annotation.DrawableRes;
@@ -17,6 +18,7 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
+
 /**
  * @author Thomas
  * @describe 资源工具类

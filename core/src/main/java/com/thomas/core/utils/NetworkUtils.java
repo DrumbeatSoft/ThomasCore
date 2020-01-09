@@ -1,4 +1,5 @@
 package com.thomas.core.utils;
+
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -33,6 +34,7 @@ import static android.Manifest.permission.ACCESS_WIFI_STATE;
 import static android.Manifest.permission.CHANGE_WIFI_STATE;
 import static android.Manifest.permission.INTERNET;
 import static android.content.Context.WIFI_SERVICE;
+
 /**
  * @author Thomas
  * @describe 网络工具类
@@ -43,16 +45,6 @@ import static android.content.Context.WIFI_SERVICE;
 public final class NetworkUtils {
     private NetworkUtils() {
         throw new UnsupportedOperationException("u can't instantiate me...");
-    }
-
-    public enum NetworkType {
-        NETWORK_ETHERNET,
-        NETWORK_WIFI,
-        NETWORK_4G,
-        NETWORK_3G,
-        NETWORK_2G,
-        NETWORK_UNKNOWN,
-        NETWORK_NO
     }
 
     /**
@@ -235,7 +227,9 @@ public final class NetworkUtils {
         try {
             TelephonyManager tm =
                     (TelephonyManager) Utils.getApp().getSystemService(Context.TELEPHONY_SERVICE);
-            if (tm == null) {return false;}
+            if (tm == null) {
+                return false;
+            }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 return tm.isDataEnabled();
             }
@@ -289,7 +283,9 @@ public final class NetworkUtils {
     public static boolean getWifiEnabled() {
         @SuppressLint("WifiManagerLeak")
         WifiManager manager = (WifiManager) Utils.getApp().getSystemService(WIFI_SERVICE);
-        if (manager == null) {return false;}
+        if (manager == null) {
+            return false;
+        }
         return manager.isWifiEnabled();
     }
 
@@ -303,8 +299,12 @@ public final class NetworkUtils {
     public static void setWifiEnabled(final boolean enabled) {
         @SuppressLint("WifiManagerLeak")
         WifiManager manager = (WifiManager) Utils.getApp().getSystemService(WIFI_SERVICE);
-        if (manager == null) {return;}
-        if (enabled == manager.isWifiEnabled()) {return;}
+        if (manager == null) {
+            return;
+        }
+        if (enabled == manager.isWifiEnabled()) {
+            return;
+        }
         manager.setWifiEnabled(enabled);
     }
 
@@ -318,7 +318,9 @@ public final class NetworkUtils {
     public static boolean isWifiConnected() {
         ConnectivityManager cm =
                 (ConnectivityManager) Utils.getApp().getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (cm == null) {return false;}
+        if (cm == null) {
+            return false;
+        }
         NetworkInfo ni = cm.getActiveNetworkInfo();
         return ni != null && ni.getType() == ConnectivityManager.TYPE_WIFI;
     }
@@ -362,7 +364,9 @@ public final class NetworkUtils {
     public static String getNetworkOperatorName() {
         TelephonyManager tm =
                 (TelephonyManager) Utils.getApp().getSystemService(Context.TELEPHONY_SERVICE);
-        if (tm == null){ return "";}
+        if (tm == null) {
+            return "";
+        }
         return tm.getNetworkOperatorName();
     }
 
@@ -444,11 +448,17 @@ public final class NetworkUtils {
     private static boolean isEthernet() {
         final ConnectivityManager cm =
                 (ConnectivityManager) Utils.getApp().getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (cm == null) {return false;}
+        if (cm == null) {
+            return false;
+        }
         final NetworkInfo info = cm.getNetworkInfo(ConnectivityManager.TYPE_ETHERNET);
-        if (info == null) {return false;}
+        if (info == null) {
+            return false;
+        }
         NetworkInfo.State state = info.getState();
-        if (null == state) {return false;}
+        if (null == state) {
+            return false;
+        }
         return state == NetworkInfo.State.CONNECTED || state == NetworkInfo.State.CONNECTING;
     }
 
@@ -456,7 +466,9 @@ public final class NetworkUtils {
     private static NetworkInfo getActiveNetworkInfo() {
         ConnectivityManager cm =
                 (ConnectivityManager) Utils.getApp().getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (cm == null){ return null;}
+        if (cm == null) {
+            return null;
+        }
         return cm.getActiveNetworkInfo();
     }
 
@@ -494,7 +506,9 @@ public final class NetworkUtils {
             while (nis.hasMoreElements()) {
                 NetworkInterface ni = nis.nextElement();
                 // To prevent phone of xiaomi return "10.0.2.15"
-                if (!ni.isUp() || ni.isLoopback()){ continue;}
+                if (!ni.isUp() || ni.isLoopback()) {
+                    continue;
+                }
                 Enumeration<InetAddress> addresses = ni.getInetAddresses();
                 while (addresses.hasMoreElements()) {
                     adds.addFirst(addresses.nextElement());
@@ -533,7 +547,9 @@ public final class NetworkUtils {
             LinkedList<InetAddress> adds = new LinkedList<>();
             while (nis.hasMoreElements()) {
                 NetworkInterface ni = nis.nextElement();
-                if (!ni.isUp() || ni.isLoopback()) {continue;}
+                if (!ni.isUp() || ni.isLoopback()) {
+                    continue;
+                }
                 List<InterfaceAddress> ias = ni.getInterfaceAddresses();
                 for (int i = 0, size = ias.size(); i < size; i++) {
                     InterfaceAddress ia = ias.get(i);
@@ -597,7 +613,9 @@ public final class NetworkUtils {
     public static String getIpAddressByWifi() {
         @SuppressLint("WifiManagerLeak")
         WifiManager wm = (WifiManager) Utils.getApp().getSystemService(Context.WIFI_SERVICE);
-        if (wm == null) {return "";}
+        if (wm == null) {
+            return "";
+        }
         return Formatter.formatIpAddress(wm.getDhcpInfo().ipAddress);
     }
 
@@ -610,7 +628,9 @@ public final class NetworkUtils {
     public static String getGatewayByWifi() {
         @SuppressLint("WifiManagerLeak")
         WifiManager wm = (WifiManager) Utils.getApp().getSystemService(Context.WIFI_SERVICE);
-        if (wm == null) {return "";}
+        if (wm == null) {
+            return "";
+        }
         return Formatter.formatIpAddress(wm.getDhcpInfo().gateway);
     }
 
@@ -623,7 +643,9 @@ public final class NetworkUtils {
     public static String getNetMaskByWifi() {
         @SuppressLint("WifiManagerLeak")
         WifiManager wm = (WifiManager) Utils.getApp().getSystemService(Context.WIFI_SERVICE);
-        if (wm == null){ return "";}
+        if (wm == null) {
+            return "";
+        }
         return Formatter.formatIpAddress(wm.getDhcpInfo().netmask);
     }
 
@@ -636,7 +658,9 @@ public final class NetworkUtils {
     public static String getServerAddressByWifi() {
         @SuppressLint("WifiManagerLeak")
         WifiManager wm = (WifiManager) Utils.getApp().getSystemService(Context.WIFI_SERVICE);
-        if (wm == null) {return "";}
+        if (wm == null) {
+            return "";
+        }
         return Formatter.formatIpAddress(wm.getDhcpInfo().serverAddress);
     }
 
@@ -658,17 +682,35 @@ public final class NetworkUtils {
         NetworkChangedReceiver.getInstance().unregisterListener(listener);
     }
 
+    public enum NetworkType {
+        NETWORK_ETHERNET,
+        NETWORK_WIFI,
+        NETWORK_4G,
+        NETWORK_3G,
+        NETWORK_2G,
+        NETWORK_UNKNOWN,
+        NETWORK_NO
+    }
+
+    public interface OnNetworkStatusChangedListener {
+        void onDisconnected();
+
+        void onConnected(NetworkType networkType);
+    }
+
     public static final class NetworkChangedReceiver extends BroadcastReceiver {
+
+        private NetworkType mType;
+        private Set<OnNetworkStatusChangedListener> mListeners = new HashSet<>();
 
         private static NetworkChangedReceiver getInstance() {
             return LazyHolder.INSTANCE;
         }
 
-        private NetworkType                         mType;
-        private Set<OnNetworkStatusChangedListener> mListeners = new HashSet<>();
-
         void registerListener(final OnNetworkStatusChangedListener listener) {
-            if (listener == null) {return;}
+            if (listener == null) {
+                return;
+            }
             Utils.runOnUiThread(new Runnable() {
                 @SuppressLint("MissingPermission")
                 @Override
@@ -685,7 +727,9 @@ public final class NetworkUtils {
         }
 
         void unregisterListener(final OnNetworkStatusChangedListener listener) {
-            if (listener == null) {return;}
+            if (listener == null) {
+                return;
+            }
             Utils.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -727,11 +771,5 @@ public final class NetworkUtils {
         private static class LazyHolder {
             private static final NetworkChangedReceiver INSTANCE = new NetworkChangedReceiver();
         }
-    }
-
-    public interface OnNetworkStatusChangedListener {
-        void onDisconnected();
-
-        void onConnected(NetworkType networkType);
     }
 }

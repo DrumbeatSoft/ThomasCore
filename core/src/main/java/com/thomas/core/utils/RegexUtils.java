@@ -226,7 +226,9 @@ public final class RegexUtils {
      * @return the list of input matches the regex
      */
     public static List<String> getMatches(final String regex, final CharSequence input) {
-        if (input == null) {return Collections.emptyList();}
+        if (input == null) {
+            return Collections.emptyList();
+        }
         List<String> matches = new ArrayList<>();
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(input);
@@ -244,7 +246,9 @@ public final class RegexUtils {
      * @return the array of strings computed by splitting input around matches of regex
      */
     public static String[] getSplits(final String input, final String regex) {
-        if (input == null) {return new String[0];}
+        if (input == null) {
+            return new String[0];
+        }
         return input.split(regex);
     }
 
@@ -262,7 +266,9 @@ public final class RegexUtils {
     public static String getReplaceFirst(final String input,
                                          final String regex,
                                          final String replacement) {
-        if (input == null) {return "";}
+        if (input == null) {
+            return "";
+        }
         return Pattern.compile(regex).matcher(input).replaceFirst(replacement);
     }
 
@@ -280,7 +286,9 @@ public final class RegexUtils {
     public static String getReplaceAll(final String input,
                                        final String regex,
                                        final String replacement) {
-        if (input == null) {return "";}
+        if (input == null) {
+            return "";
+        }
         return Pattern.compile(regex).matcher(input).replaceAll(replacement);
     }
 }

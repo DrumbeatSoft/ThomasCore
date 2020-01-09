@@ -30,18 +30,18 @@ import java.util.List;
  */
 public final class FragmentUtils {
 
-    private static final int TYPE_ADD_FRAGMENT       = 0x01;
-    private static final int TYPE_SHOW_FRAGMENT      = 0x01 << 1;
-    private static final int TYPE_HIDE_FRAGMENT      = 0x01 << 2;
+    private static final int TYPE_ADD_FRAGMENT = 0x01;
+    private static final int TYPE_SHOW_FRAGMENT = 0x01 << 1;
+    private static final int TYPE_HIDE_FRAGMENT = 0x01 << 2;
     private static final int TYPE_SHOW_HIDE_FRAGMENT = 0x01 << 3;
-    private static final int TYPE_REPLACE_FRAGMENT   = 0x01 << 4;
-    private static final int TYPE_REMOVE_FRAGMENT    = 0x01 << 5;
+    private static final int TYPE_REPLACE_FRAGMENT = 0x01 << 4;
+    private static final int TYPE_REMOVE_FRAGMENT = 0x01 << 5;
     private static final int TYPE_REMOVE_TO_FRAGMENT = 0x01 << 6;
 
-    private static final String ARGS_ID           = "args_id";
-    private static final String ARGS_IS_HIDE      = "args_is_hide";
+    private static final String ARGS_ID = "args_id";
+    private static final String ARGS_IS_HIDE = "args_is_hide";
     private static final String ARGS_IS_ADD_STACK = "args_is_add_stack";
-    private static final String ARGS_TAG          = "args_tag";
+    private static final String ARGS_TAG = "args_tag";
 
     private FragmentUtils() {
         throw new UnsupportedOperationException("u can't instantiate me...");
@@ -1793,11 +1793,15 @@ public final class FragmentUtils {
         return fragment == null ? "null" : fragment.getClass().getSimpleName();
     }
 
+    public interface OnBackClickListener {
+        boolean onBackClick();
+    }
+
     private static class Args {
-        final int     id;
+        final int id;
         final boolean isHide;
         final boolean isAddStack;
-        final String  tag;
+        final String tag;
 
         Args(final int id, final boolean isHide, final boolean isAddStack) {
             this(id, null, isHide, isAddStack);
@@ -1812,8 +1816,12 @@ public final class FragmentUtils {
         }
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    // interface
+    ///////////////////////////////////////////////////////////////////////////
+
     public static class FragmentNode {
-        final Fragment           fragment;
+        final Fragment fragment;
         final List<FragmentNode> next;
 
         public FragmentNode(final Fragment fragment, final List<FragmentNode> next) {
@@ -1835,13 +1843,5 @@ public final class FragmentUtils {
                     + "->"
                     + ((next == null || next.isEmpty()) ? "no child" : next.toString());
         }
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // interface
-    ///////////////////////////////////////////////////////////////////////////
-
-    public interface OnBackClickListener {
-        boolean onBackClick();
     }
 }

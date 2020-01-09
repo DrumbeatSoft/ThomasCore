@@ -91,7 +91,9 @@ public final class IntentUtils {
      * @return the intent of install app
      */
     public static Intent getInstallAppIntent(final File file, final boolean isNewTask) {
-        if (file == null) {return null;}
+        if (file == null) {
+            return null;
+        }
         Intent intent = new Intent(Intent.ACTION_VIEW);
         Uri data;
         String type = "application/vnd.android.package-archive";
@@ -334,10 +336,14 @@ public final class IntentUtils {
     public static Intent getShareImageIntent(final String content,
                                              final List<File> images,
                                              final boolean isNewTask) {
-        if (images == null || images.isEmpty()) {return null;}
+        if (images == null || images.isEmpty()) {
+            return null;
+        }
         ArrayList<Uri> uris = new ArrayList<>();
         for (File image : images) {
-            if (!image.isFile()){ continue;}
+            if (!image.isFile()) {
+                continue;
+            }
             uris.add(file2Uri(image));
         }
         return getShareImageIntent(content, uris, isNewTask);
@@ -573,7 +579,9 @@ public final class IntentUtils {
     }
 
     private static boolean isSpace(final String s) {
-        if (s == null) {return true;}
+        if (s == null) {
+            return true;
+        }
         for (int i = 0, len = s.length(); i < len; ++i) {
             if (!Character.isWhitespace(s.charAt(i))) {
                 return false;
@@ -583,7 +591,9 @@ public final class IntentUtils {
     }
 
     private static Uri file2Uri(final File file) {
-        if (file == null) {return null;}
+        if (file == null) {
+            return null;
+        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             String authority = Utils.getApp().getPackageName() + ".thomas.provider";
             return FileProvider.getUriForFile(Utils.getApp(), authority, file);

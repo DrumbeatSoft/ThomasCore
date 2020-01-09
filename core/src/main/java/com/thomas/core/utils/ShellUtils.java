@@ -208,7 +208,9 @@ public final class ShellUtils {
             process = Runtime.getRuntime().exec(isRooted ? "su" : "sh");
             os = new DataOutputStream(process.getOutputStream());
             for (String command : commands) {
-                if (command == null) {continue;}
+                if (command == null) {
+                    continue;
+                }
                 os.write(command.getBytes());
                 os.writeBytes(LINE_SEP);
                 os.flush();
@@ -278,7 +280,7 @@ public final class ShellUtils {
      * The result of command.
      */
     public static class CommandResult {
-        public int    result;
+        public int result;
         public String successMsg;
         public String errorMsg;
 

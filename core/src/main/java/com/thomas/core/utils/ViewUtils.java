@@ -33,10 +33,14 @@ public class ViewUtils {
      * @param excludes The excludes.
      */
     public static void setViewEnabled(View view, boolean enabled, View... excludes) {
-        if (view == null) {return;}
+        if (view == null) {
+            return;
+        }
         if (excludes != null) {
             for (View exclude : excludes) {
-                if (view == exclude) {return;}
+                if (view == exclude) {
+                    return;
+                }
             }
         }
         if (view instanceof ViewGroup) {

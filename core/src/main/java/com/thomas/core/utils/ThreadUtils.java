@@ -36,13 +36,13 @@ public final class ThreadUtils {
 
     private static final Map<Task, TaskInfo> TASK_TASKINFO_MAP = new ConcurrentHashMap<>();
 
-    private static final int   CPU_COUNT = Runtime.getRuntime().availableProcessors();
-    private static final Timer TIMER     = new Timer();
+    private static final int CPU_COUNT = Runtime.getRuntime().availableProcessors();
+    private static final Timer TIMER = new Timer();
 
     private static final byte TYPE_SINGLE = -1;
     private static final byte TYPE_CACHED = -2;
-    private static final byte TYPE_IO     = -4;
-    private static final byte TYPE_CPU    = -8;
+    private static final byte TYPE_IO = -4;
+    private static final byte TYPE_CPU = -8;
 
     private static Executor sDeliver;
 
@@ -977,7 +977,37 @@ public final class ThreadUtils {
         }
     }
 
+    private static Executor getGlobalDeliver() {
+        if (sDeliver == null) {
+            sDeliver = new Executor() {
+                private final Handler mHandler = new Handler(Looper.getMainLooper());
+
+                @Override
+                public void execute(@NonNull Runnable command) {
+                    mHandler.post(command);
+                }
+            };
+        }
+        return sDeliver;
+    }
+
     static final class ThreadPoolExecutor4Util extends ThreadPoolExecutor {
+
+        private final AtomicInteger mSubmittedCount = new AtomicInteger();
+        private LinkedBlockingQueue4Util mWorkQueue;
+
+        ThreadPoolExecutor4Util(int corePoolSize, int maximumPoolSize,
+                                long keepAliveTime, TimeUnit unit,
+                                LinkedBlockingQueue4Util workQueue,
+                                ThreadFactory threadFactory) {
+            super(corePoolSize, maximumPoolSize,
+                    keepAliveTime, unit,
+                    workQueue,
+                    threadFactory
+            );
+            workQueue.mPool = this;
+            mWorkQueue = workQueue;
+        }
 
         private static ExecutorService createPool(final int type, final int priority) {
             switch (type) {
@@ -1014,23 +1044,6 @@ public final class ThreadUtils {
             }
         }
 
-        private final AtomicInteger mSubmittedCount = new AtomicInteger();
-
-        private LinkedBlockingQueue4Util mWorkQueue;
-
-        ThreadPoolExecutor4Util(int corePoolSize, int maximumPoolSize,
-                                long keepAliveTime, TimeUnit unit,
-                                LinkedBlockingQueue4Util workQueue,
-                                ThreadFactory threadFactory) {
-            super(corePoolSize, maximumPoolSize,
-                    keepAliveTime, unit,
-                    workQueue,
-                    threadFactory
-            );
-            workQueue.mPool = this;
-            mWorkQueue = workQueue;
-        }
-
         private int getSubmittedCount() {
             return mSubmittedCount.get();
         }
@@ -1043,7 +1056,9 @@ public final class ThreadUtils {
 
         @Override
         public void execute(@NonNull Runnable command) {
-            if (this.isShutdown()) {return;}
+            if (this.isShutdown()) {
+                return;
+            }
             mSubmittedCount.incrementAndGet();
             try {
                 super.execute(command);
@@ -1091,11 +1106,11 @@ public final class ThreadUtils {
 
     private static final class UtilsThreadFactory extends AtomicLong
             implements ThreadFactory {
-        private static final AtomicInteger POOL_NUMBER      = new AtomicInteger(1);
-        private static final long          serialVersionUID = -9209200509960368598L;
-        private final        String        namePrefix;
-        private final        int           priority;
-        private final        boolean       isDaemon;
+        private static final AtomicInteger POOL_NUMBER = new AtomicInteger(1);
+        private static final long serialVersionUID = -9209200509960368598L;
+        private final String namePrefix;
+        private final int priority;
+        private final boolean isDaemon;
 
         UtilsThreadFactory(String prefix, int priority) {
             this(prefix, priority, false);
@@ -1149,18 +1164,18 @@ public final class ThreadUtils {
 
     public abstract static class Task<T> implements Runnable {
 
-        private static final int NEW         = 0;
-        private static final int RUNNING     = 1;
+        private static final int NEW = 0;
+        private static final int RUNNING = 1;
         private static final int EXCEPTIONAL = 2;
-        private static final int COMPLETING  = 3;
-        private static final int CANCELLED   = 4;
+        private static final int COMPLETING = 3;
+        private static final int CANCELLED = 4;
         private static final int INTERRUPTED = 5;
-        private static final int TIMEOUT     = 6;
+        private static final int TIMEOUT = 6;
 
         private final AtomicInteger state = new AtomicInteger(NEW);
 
         private volatile boolean isSchedule;
-        private volatile Thread  runner;
+        private volatile Thread runner;
 
         private Timer mTimer;
 
@@ -1178,19 +1193,27 @@ public final class ThreadUtils {
         public void run() {
             if (isSchedule) {
                 if (runner == null) {
-                    if (!state.compareAndSet(NEW, RUNNING)) {return;}
+                    if (!state.compareAndSet(NEW, RUNNING)) {
+                        return;
+                    }
                     runner = Thread.currentThread();
                 } else {
-                    if (state.get() != RUNNING){ return;}
+                    if (state.get() != RUNNING) {
+                        return;
+                    }
                 }
             } else {
-                if (!state.compareAndSet(NEW, RUNNING)) {return;}
+                if (!state.compareAndSet(NEW, RUNNING)) {
+                    return;
+                }
                 runner = Thread.currentThread();
             }
             try {
                 final T result = doInBackground();
                 if (isSchedule) {
-                    if (state.get() != RUNNING){ return;}
+                    if (state.get() != RUNNING) {
+                        return;
+                    }
                     getDeliver().execute(new Runnable() {
                         @Override
                         public void run() {
@@ -1198,7 +1221,9 @@ public final class ThreadUtils {
                         }
                     });
                 } else {
-                    if (!state.compareAndSet(RUNNING, COMPLETING)) {return;}
+                    if (!state.compareAndSet(RUNNING, COMPLETING)) {
+                        return;
+                    }
                     getDeliver().execute(new Runnable() {
                         @Override
                         public void run() {
@@ -1210,7 +1235,9 @@ public final class ThreadUtils {
             } catch (InterruptedException ignore) {
                 state.compareAndSet(CANCELLED, INTERRUPTED);
             } catch (final Throwable throwable) {
-                if (!state.compareAndSet(RUNNING, EXCEPTIONAL)) {return;}
+                if (!state.compareAndSet(RUNNING, EXCEPTIONAL)) {
+                    return;
+                }
                 getDeliver().execute(new Runnable() {
                     @Override
                     public void run() {
@@ -1227,7 +1254,9 @@ public final class ThreadUtils {
 
         public void cancel(boolean mayInterruptIfRunning) {
             synchronized (state) {
-                if (state.get() > RUNNING) {return;}
+                if (state.get() > RUNNING) {
+                    return;
+                }
                 state.set(CANCELLED);
             }
             if (mayInterruptIfRunning) {
@@ -1247,7 +1276,9 @@ public final class ThreadUtils {
 
         private void timeout() {
             synchronized (state) {
-                if (state.get() > RUNNING) {return;}
+                if (state.get() > RUNNING) {
+                    return;
+                }
                 state.set(TIMEOUT);
             }
             if (runner != null) {
@@ -1263,11 +1294,6 @@ public final class ThreadUtils {
 
         public boolean isDone() {
             return state.get() > RUNNING;
-        }
-
-        public Task<T> setDeliver(Executor deliver) {
-            this.deliver = deliver;
-            return this;
         }
 
         public void setTimeout(final long timeoutMillis, final OnTimeoutListener listener) {
@@ -1294,6 +1320,11 @@ public final class ThreadUtils {
             return deliver;
         }
 
+        public Task<T> setDeliver(Executor deliver) {
+            this.deliver = deliver;
+            return this;
+        }
+
         @CallSuper
         protected void onDone() {
             TASK_TASKINFO_MAP.remove(this);
@@ -1308,22 +1339,8 @@ public final class ThreadUtils {
         }
     }
 
-    private static Executor getGlobalDeliver() {
-        if (sDeliver == null) {
-            sDeliver = new Executor() {
-                private final Handler mHandler = new Handler(Looper.getMainLooper());
-
-                @Override
-                public void execute(@NonNull Runnable command) {
-                    mHandler.post(command);
-                }
-            };
-        }
-        return sDeliver;
-    }
-
     private static class TaskInfo {
-        private TimerTask       mTimerTask;
+        private TimerTask mTimerTask;
         private ExecutorService mService;
 
         private TaskInfo(ExecutorService service) {

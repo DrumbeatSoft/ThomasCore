@@ -35,6 +35,9 @@ import static android.content.Context.WIFI_SERVICE;
  * @since 1.0.0
  */
 public final class DeviceUtils {
+    private static final String KEY_UDID = "KEY_UDID";
+    private volatile static String udid;
+
     private DeviceUtils() {
         throw new UnsupportedOperationException("u can't instantiate me...");
     }
@@ -373,10 +376,6 @@ public final class DeviceUtils {
 
         return false;
     }
-
-
-    private static final    String KEY_UDID = "KEY_UDID";
-    private volatile static String udid;
 
     /**
      * Return the unique device id.

@@ -33,23 +33,33 @@ import java.util.Set;
  * @updatelog
  * @since
  */
-public final  class PermissionUtils {
+public final class PermissionUtils {
     private static final List<String> PERMISSIONS = getPermissions();
 
     private static PermissionUtils sInstance;
-
-    private OnRationaleListener mOnRationaleListener;
-    private SimpleCallback      mSimpleCallback;
-    private FullCallback        mFullCallback;
-    private ThemeCallback       mThemeCallback;
-    private Set<String>         mPermissions;
-    private List<String>        mPermissionsRequest;
-    private List<String>        mPermissionsGranted;
-    private List<String>        mPermissionsDenied;
-    private List<String>        mPermissionsDeniedForever;
-
     private static SimpleCallback sSimpleCallback4WriteSettings;
     private static SimpleCallback sSimpleCallback4DrawOverlays;
+    private OnRationaleListener mOnRationaleListener;
+    private SimpleCallback mSimpleCallback;
+    private FullCallback mFullCallback;
+    private ThemeCallback mThemeCallback;
+    private Set<String> mPermissions;
+    private List<String> mPermissionsRequest;
+    private List<String> mPermissionsGranted;
+    private List<String> mPermissionsDenied;
+    private List<String> mPermissionsDeniedForever;
+
+    private PermissionUtils(final String... permissions) {
+        mPermissions = new LinkedHashSet<>();
+        for (String permission : permissions) {
+            for (String aPermission : PermissionConstants.getPermissions(permission)) {
+                if (PERMISSIONS.contains(aPermission)) {
+                    mPermissions.add(aPermission);
+                }
+            }
+        }
+        sInstance = this;
+    }
 
     /**
      * Return the permissions used in application.
@@ -186,18 +196,6 @@ public final  class PermissionUtils {
                 .getPackageManager()
                 .queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY)
                 .size() > 0;
-    }
-
-    private PermissionUtils(final String... permissions) {
-        mPermissions = new LinkedHashSet<>();
-        for (String permission : permissions) {
-            for (String aPermission : PermissionConstants.getPermissions(permission)) {
-                if (PERMISSIONS.contains(aPermission)) {
-                    mPermissions.add(aPermission);
-                }
-            }
-        }
-        sInstance = this;
     }
 
     /**
@@ -346,13 +344,42 @@ public final  class PermissionUtils {
         requestCallback();
     }
 
+    public interface OnRationaleListener {
+
+        void rationale(ShouldRequest shouldRequest);
+
+        interface ShouldRequest {
+            void again(boolean again);
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // interface
+    ///////////////////////////////////////////////////////////////////////////
+
+    public interface SimpleCallback {
+        void onGranted();
+
+        void onDenied();
+    }
+
+    public interface FullCallback {
+        void onGranted(List<String> permissionsGranted);
+
+        void onDenied(List<String> permissionsDeniedForever, List<String> permissionsDenied);
+    }
+
+    public interface ThemeCallback {
+        void onActivityCreate(Activity activity);
+    }
+
     @RequiresApi(api = Build.VERSION_CODES.M)
     static final class PermissionActivityImpl extends Utils.TransActivity.TransActivityDelegate {
 
-        private static final String TYPE                = "TYPE";
-        private static final int    TYPE_RUNTIME        = 0x01;
-        private static final int    TYPE_WRITE_SETTINGS = 0x02;
-        private static final int    TYPE_DRAW_OVERLAYS  = 0x03;
+        private static final String TYPE = "TYPE";
+        private static final int TYPE_RUNTIME = 0x01;
+        private static final int TYPE_WRITE_SETTINGS = 0x02;
+        private static final int TYPE_DRAW_OVERLAYS = 0x03;
 
         private static PermissionActivityImpl INSTANCE = new PermissionActivityImpl();
 
@@ -439,34 +466,5 @@ public final  class PermissionUtils {
             }
             activity.finish();
         }
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // interface
-    ///////////////////////////////////////////////////////////////////////////
-
-    public interface OnRationaleListener {
-
-        void rationale(ShouldRequest shouldRequest);
-
-        interface ShouldRequest {
-            void again(boolean again);
-        }
-    }
-
-    public interface SimpleCallback {
-        void onGranted();
-
-        void onDenied();
-    }
-
-    public interface FullCallback {
-        void onGranted(List<String> permissionsGranted);
-
-        void onDenied(List<String> permissionsDeniedForever, List<String> permissionsDenied);
-    }
-
-    public interface ThemeCallback {
-        void onActivityCreate(Activity activity);
     }
 }

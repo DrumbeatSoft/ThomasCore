@@ -23,6 +23,7 @@ import androidx.fragment.app.Fragment;
 
 import java.util.ArrayList;
 import java.util.List;
+
 /**
  * @author Thomas
  * @describe
@@ -30,7 +31,7 @@ import java.util.List;
  * @updatelog
  * @since 1.0.0
  */
-public final  class ActivityUtils {
+public final class ActivityUtils {
     private ActivityUtils() {
         throw new UnsupportedOperationException("u can't instantiate me...");
     }

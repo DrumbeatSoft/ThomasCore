@@ -26,7 +26,6 @@ public class DashboardFragment extends BaseDemoFragment {
             btnScreen, btnSP, btnSpan, btnToast, btnVibrate;
 
 
-
     @Override
     public void initData(@Nullable Bundle bundle) {
 

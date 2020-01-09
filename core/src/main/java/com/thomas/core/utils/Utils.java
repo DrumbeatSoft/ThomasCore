@@ -46,11 +46,11 @@ import java.util.concurrent.ExecutorService;
  * @updatelog
  * @since 1.0.0
  */
-public final  class Utils {
+public final class Utils {
 
     private static final ActivityLifecycleImpl ACTIVITY_LIFECYCLE = new ActivityLifecycleImpl();
-    private static final ExecutorService       UTIL_POOL          = ThreadUtils.getCachedPool();
-    private static final Handler               UTIL_HANDLER       = new Handler(Looper.getMainLooper());
+    private static final ExecutorService UTIL_POOL = ThreadUtils.getCachedPool();
+    private static final Handler UTIL_HANDLER = new Handler(Looper.getMainLooper());
 
     @SuppressLint("StaticFieldLeak")
     private static Application sApplication;
@@ -110,7 +110,9 @@ public final  class Utils {
      * @return the context of Application object
      */
     public static Application getApp() {
-        if (sApplication != null){ return sApplication;}
+        if (sApplication != null) {
+            return sApplication;
+        }
         Application app = getApplicationByReflect();
         init(app);
         return app;
@@ -135,9 +137,13 @@ public final  class Utils {
 
     static boolean isAppForeground() {
         ActivityManager am = (ActivityManager) Utils.getApp().getSystemService(Context.ACTIVITY_SERVICE);
-        if (am == null){ return false;}
+        if (am == null) {
+            return false;
+        }
         List<ActivityManager.RunningAppProcessInfo> info = am.getRunningAppProcesses();
-        if (info == null || info.size() == 0) {return false;}
+        if (info == null || info.size() == 0) {
+            return false;
+        }
         for (ActivityManager.RunningAppProcessInfo aInfo : info) {
             if (aInfo.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
                 if (aInfo.processName.equals(Utils.getApp().getPackageName())) {
@@ -167,9 +173,13 @@ public final  class Utils {
 
     static String getCurrentProcessName() {
         String name = getCurrentProcessNameByFile();
-        if (!TextUtils.isEmpty(name)){ return name;}
+        if (!TextUtils.isEmpty(name)) {
+            return name;
+        }
         name = getCurrentProcessNameByAms();
-        if (!TextUtils.isEmpty(name)){ return name;}
+        if (!TextUtils.isEmpty(name)) {
+            return name;
+        }
         name = getCurrentProcessNameByReflect();
         return name;
     }
@@ -177,7 +187,9 @@ public final  class Utils {
     static void fixSoftInputLeaks(final Window window) {
         InputMethodManager imm =
                 (InputMethodManager) Utils.getApp().getSystemService(Context.INPUT_METHOD_SERVICE);
-        if (imm == null){ return;}
+        if (imm == null) {
+            return;
+        }
         String[] leakViews = new String[]{"mLastSrvView", "mCurRootView", "mServedView", "mNextServedView"};
         for (String leakView : leakViews) {
             try {
@@ -186,7 +198,9 @@ public final  class Utils {
                     leakViewField.setAccessible(true);
                 }
                 Object obj = leakViewField.get(imm);
-                if (!(obj instanceof View)){ continue;}
+                if (!(obj instanceof View)) {
+                    continue;
+                }
                 View view = (View) obj;
                 if (view.getRootView() == window.getDecorView().getRootView()) {
                     leakViewField.set(imm, null);
@@ -195,7 +209,7 @@ public final  class Utils {
         }
     }
 
-    static SPUtils getThomasCore(){
+    static SPUtils getThomasCore() {
         return SPUtils.getInstance("ThomasCore");
     }
 
@@ -218,9 +232,13 @@ public final  class Utils {
 
     private static String getCurrentProcessNameByAms() {
         ActivityManager am = (ActivityManager) Utils.getApp().getSystemService(Context.ACTIVITY_SERVICE);
-        if (am == null){ return "";}
+        if (am == null) {
+            return "";
+        }
         List<ActivityManager.RunningAppProcessInfo> info = am.getRunningAppProcesses();
-        if (info == null || info.size() == 0){ return "";}
+        if (info == null || info.size() == 0) {
+            return "";
+        }
         int pid = android.os.Process.myPid();
         for (ActivityManager.RunningAppProcessInfo aInfo : info) {
             if (aInfo.pid == pid) {
@@ -301,10 +319,36 @@ public final  class Utils {
     // TransActivity
     ///////////////////////////////////////////////////////////////////////////
 
+    public interface Callback<T> {
+        void onCall(T data);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // lifecycle
+    ///////////////////////////////////////////////////////////////////////////
+
+    public interface OnAppStatusChangedListener {
+        void onForeground(Activity activity);
+
+        void onBackground(Activity activity);
+    }
+
+    public interface OnActivityDestroyedListener {
+        void onActivityDestroyed(Activity activity);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // interface
+    ///////////////////////////////////////////////////////////////////////////
+
+    public interface Func1<Ret, Par> {
+        Ret call(Par param);
+    }
+
     public static final class TransActivity extends FragmentActivity {
 
         private static final Map<TransActivity, TransActivityDelegate> CALLBACK_MAP = new HashMap<>();
-        private static       TransActivityDelegate                     sDelegate;
+        private static TransActivityDelegate sDelegate;
 
         public static void start(final Func1<Void, Intent> consumer,
                                  final TransActivityDelegate delegate) {
@@ -436,19 +480,15 @@ public final  class Utils {
         }
     }
 
-    ///////////////////////////////////////////////////////////////////////////
-    // lifecycle
-    ///////////////////////////////////////////////////////////////////////////
-
     static class ActivityLifecycleImpl implements ActivityLifecycleCallbacks {
 
-        final LinkedList<Activity>                             mActivityList         = new LinkedList<>();
-        final List<OnAppStatusChangedListener>                 mStatusListeners      = new ArrayList<>();
+        final LinkedList<Activity> mActivityList = new LinkedList<>();
+        final List<OnAppStatusChangedListener> mStatusListeners = new ArrayList<>();
         final Map<Activity, List<OnActivityDestroyedListener>> mDestroyedListenerMap = new HashMap<>();
 
-        private int     mForegroundCount = 0;
-        private int     mConfigCount     = 0;
-        private boolean mIsBackground    = false;
+        private int mForegroundCount = 0;
+        private int mConfigCount = 0;
+        private boolean mIsBackground = false;
 
         @Override
         public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
@@ -527,6 +567,18 @@ public final  class Utils {
             return topActivityByReflect;
         }
 
+        private void setTopActivity(final Activity activity) {
+//            if (TransActivity.class == activity.getClass()) return;
+            if (mActivityList.contains(activity)) {
+                if (!mActivityList.getLast().equals(activity)) {
+                    mActivityList.remove(activity);
+                    mActivityList.addLast(activity);
+                }
+            } else {
+                mActivityList.addLast(activity);
+            }
+        }
+
         void addOnAppStatusChangedListener(final OnAppStatusChangedListener listener) {
             mStatusListeners.add(listener);
         }
@@ -590,18 +642,6 @@ public final  class Utils {
             }
         }
 
-        private void setTopActivity(final Activity activity) {
-//            if (TransActivity.class == activity.getClass()) return;
-            if (mActivityList.contains(activity)) {
-                if (!mActivityList.getLast().equals(activity)) {
-                    mActivityList.remove(activity);
-                    mActivityList.addLast(activity);
-                }
-            } else {
-                mActivityList.addLast(activity);
-            }
-        }
-
         private void consumeOnActivityDestroyedListener(Activity activity) {
             Iterator<Map.Entry<Activity, List<OnActivityDestroyedListener>>> iterator
                     = mDestroyedListenerMap.entrySet().iterator();
@@ -625,7 +665,9 @@ public final  class Utils {
                 Field mActivityListField = activityThreadClass.getDeclaredField("mActivityList");
                 mActivityListField.setAccessible(true);
                 Map activities = (Map) mActivityListField.get(currentActivityThreadMethod);
-                if (activities == null) {return null;}
+                if (activities == null) {
+                    return null;
+                }
                 for (Object activityRecord : activities.values()) {
                     Class activityRecordClass = activityRecord.getClass();
                     Field pausedField = activityRecordClass.getDeclaredField("paused");
@@ -652,33 +694,30 @@ public final  class Utils {
         }
     }
 
-    ///////////////////////////////////////////////////////////////////////////
-    // interface
-    ///////////////////////////////////////////////////////////////////////////
-
     public abstract static class Task<Result> implements Runnable {
 
-        private static final int NEW         = 0;
-        private static final int COMPLETING  = 1;
-        private static final int CANCELLED   = 2;
+        private static final int NEW = 0;
+        private static final int COMPLETING = 1;
+        private static final int CANCELLED = 2;
         private static final int EXCEPTIONAL = 3;
 
         private volatile int state = NEW;
-
-        abstract Result doInBackground();
-
         private Callback<Result> mCallback;
 
         public Task(final Callback<Result> callback) {
             mCallback = callback;
         }
 
+        abstract Result doInBackground();
+
         @Override
         public void run() {
             try {
                 final Result t = doInBackground();
 
-                if (state != NEW) {return;}
+                if (state != NEW) {
+                    return;
+                }
                 state = COMPLETING;
                 UTIL_HANDLER.post(new Runnable() {
                     @Override
@@ -687,7 +726,9 @@ public final  class Utils {
                     }
                 });
             } catch (Throwable th) {
-                if (state != NEW) {return;}
+                if (state != NEW) {
+                    return;
+                }
                 state = EXCEPTIONAL;
             }
         }
@@ -703,23 +744,5 @@ public final  class Utils {
         public boolean isCanceled() {
             return state == CANCELLED;
         }
-    }
-
-    public interface Callback<T> {
-        void onCall(T data);
-    }
-
-    public interface OnAppStatusChangedListener {
-        void onForeground(Activity activity);
-
-        void onBackground(Activity activity);
-    }
-
-    public interface OnActivityDestroyedListener {
-        void onActivityDestroyed(Activity activity);
-    }
-
-    public interface Func1<Ret, Par> {
-        Ret call(Par param);
     }
 }

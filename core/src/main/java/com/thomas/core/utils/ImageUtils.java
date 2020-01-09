@@ -46,6 +46,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+
 /**
  * @author Thomas
  * @describe 图片工具类
@@ -54,6 +55,9 @@ import java.io.OutputStream;
  * @since 1.0.0
  */
 public final class ImageUtils {
+    private static final char[] hexDigits =
+            {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+
     private ImageUtils() {
         throw new UnsupportedOperationException("u can't instantiate me...");
     }
@@ -1631,9 +1635,6 @@ public final class ImageUtils {
             return ImageType.TYPE_UNKNOWN;
         }
     }
-
-    private static final char[] hexDigits =
-            {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
 
     private static String bytes2HexString(final byte[] bytes) {
         if (bytes == null) return "";

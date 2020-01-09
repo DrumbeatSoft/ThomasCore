@@ -36,17 +36,17 @@ import java.lang.reflect.Field;
  * @since 1.0.0
  */
 public final class ToastUtils {
-    private static final int    COLOR_DEFAULT = 0xFEFFFFFF;
-    private static final String NULL          = "null";
+    private static final int COLOR_DEFAULT = 0xFEFFFFFF;
+    private static final String NULL = "null";
 
     private static IToast iToast;
-    private static int    sGravity     = -1;
-    private static int    sXOffset     = -1;
-    private static int    sYOffset     = -1;
-    private static int    sBgColor     = COLOR_DEFAULT;
-    private static int    sBgResource  = -1;
-    private static int    sMsgColor    = COLOR_DEFAULT;
-    private static int    sMsgTextSize = -1;
+    private static int sGravity = -1;
+    private static int sXOffset = -1;
+    private static int sYOffset = -1;
+    private static int sBgColor = COLOR_DEFAULT;
+    private static int sBgResource = -1;
+    private static int sMsgColor = COLOR_DEFAULT;
+    private static int sMsgTextSize = -1;
 
     private ToastUtils() {
         throw new UnsupportedOperationException("u can't instantiate me...");
@@ -343,6 +343,25 @@ public final class ToastUtils {
         return inflate.inflate(layoutId, null);
     }
 
+    interface IToast {
+
+        void show();
+
+        void cancel();
+
+        View getView();
+
+        void setView(View view);
+
+        void setDuration(int duration);
+
+        void setGravity(int gravity, int xOffset, int yOffset);
+
+        void setText(@StringRes int resId);
+
+        void setText(CharSequence s);
+    }
+
     static class ToastFactory {
 
         static IToast makeToast(Context context, CharSequence text, int duration) {
@@ -420,11 +439,6 @@ public final class ToastUtils {
 
     static class ToastWithoutNotification extends AbsToast {
 
-        private View          mView;
-        private WindowManager mWM;
-
-        private WindowManager.LayoutParams mParams = new WindowManager.LayoutParams();
-
         private static final Utils.OnActivityDestroyedListener LISTENER =
                 new Utils.OnActivityDestroyedListener() {
                     @Override
@@ -434,6 +448,9 @@ public final class ToastUtils {
                         iToast.cancel();
                     }
                 };
+        private View mView;
+        private WindowManager mWM;
+        private WindowManager.LayoutParams mParams = new WindowManager.LayoutParams();
 
         ToastWithoutNotification(Toast toast) {
             super(toast);
@@ -532,13 +549,13 @@ public final class ToastUtils {
         }
 
         @Override
-        public void setView(View view) {
-            mToast.setView(view);
+        public View getView() {
+            return mToast.getView();
         }
 
         @Override
-        public View getView() {
-            return mToast.getView();
+        public void setView(View view) {
+            mToast.setView(view);
         }
 
         @Override
@@ -560,24 +577,5 @@ public final class ToastUtils {
         public void setText(CharSequence s) {
             mToast.setText(s);
         }
-    }
-
-    interface IToast {
-
-        void show();
-
-        void cancel();
-
-        void setView(View view);
-
-        View getView();
-
-        void setDuration(int duration);
-
-        void setGravity(int gravity, int xOffset, int yOffset);
-
-        void setText(@StringRes int resId);
-
-        void setText(CharSequence s);
     }
 }

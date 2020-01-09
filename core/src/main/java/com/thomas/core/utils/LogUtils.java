@@ -70,43 +70,32 @@ public final class LogUtils {
     public static final int W = Log.WARN;
     public static final int E = Log.ERROR;
     public static final int A = Log.ASSERT;
-
-    @IntDef({V, D, I, W, E, A})
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface TYPE {
-    }
-
     private static final char[] T = new char[]{'V', 'D', 'I', 'W', 'E', 'A'};
-
     private static final int FILE = 0x10;
     private static final int JSON = 0x20;
-    private static final int XML  = 0x30;
-
-    private static final String FILE_SEP       = System.getProperty("file.separator");
-    private static final String LINE_SEP       = System.getProperty("line.separator");
-    private static final String TOP_CORNER     = "┌";
-    private static final String MIDDLE_CORNER  = "├";
-    private static final String LEFT_BORDER    = "│ ";
-    private static final String BOTTOM_CORNER  = "└";
-    private static final String SIDE_DIVIDER   =
+    private static final int XML = 0x30;
+    private static final String FILE_SEP = System.getProperty("file.separator");
+    private static final String LINE_SEP = System.getProperty("line.separator");
+    private static final String TOP_CORNER = "┌";
+    private static final String MIDDLE_CORNER = "├";
+    private static final String LEFT_BORDER = "│ ";
+    private static final String BOTTOM_CORNER = "└";
+    private static final String SIDE_DIVIDER =
             "────────────────────────────────────────────────────────";
     private static final String MIDDLE_DIVIDER =
             "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄";
-    private static final String TOP_BORDER     = TOP_CORNER + SIDE_DIVIDER + SIDE_DIVIDER;
-    private static final String MIDDLE_BORDER  = MIDDLE_CORNER + MIDDLE_DIVIDER + MIDDLE_DIVIDER;
-    private static final String BOTTOM_BORDER  = BOTTOM_CORNER + SIDE_DIVIDER + SIDE_DIVIDER;
-    private static final int    MAX_LEN        = 1100;// fit for Chinese character
-    private static final String NOTHING        = "log nothing";
-    private static final String NULL           = "null";
-    private static final String ARGS           = "args";
-    private static final String PLACEHOLDER    = " ";
-    private static final Config CONFIG         = new Config();
-
-    private static SimpleDateFormat simpleDateFormat;
-
+    private static final String TOP_BORDER = TOP_CORNER + SIDE_DIVIDER + SIDE_DIVIDER;
+    private static final String MIDDLE_BORDER = MIDDLE_CORNER + MIDDLE_DIVIDER + MIDDLE_DIVIDER;
+    private static final String BOTTOM_BORDER = BOTTOM_CORNER + SIDE_DIVIDER + SIDE_DIVIDER;
+    private static final int MAX_LEN = 1100;// fit for Chinese character
+    private static final String NOTHING = "log nothing";
+    private static final String NULL = "null";
+    private static final String ARGS = "args";
+    private static final String PLACEHOLDER = " ";
+    private static final Config CONFIG = new Config();
     private static final ExecutorService EXECUTOR = Executors.newSingleThreadExecutor();
-
     private static final SimpleArrayMap<Class, IFormatter> I_FORMATTER_MAP = new SimpleArrayMap<>();
+    private static SimpleDateFormat simpleDateFormat;
 
     private LogUtils() {
         throw new UnsupportedOperationException("u can't instantiate me...");
@@ -646,25 +635,93 @@ public final class LogUtils {
         }
     }
 
+    private static <T> Class getTypeClassFromParadigm(final IFormatter<T> formatter) {
+        Type[] genericInterfaces = formatter.getClass().getGenericInterfaces();
+        Type type;
+        if (genericInterfaces.length == 1) {
+            type = genericInterfaces[0];
+        } else {
+            type = formatter.getClass().getGenericSuperclass();
+        }
+        type = ((ParameterizedType) type).getActualTypeArguments()[0];
+        while (type instanceof ParameterizedType) {
+            type = ((ParameterizedType) type).getRawType();
+        }
+        String className = type.toString();
+        if (className.startsWith("class ")) {
+            className = className.substring(6);
+        } else if (className.startsWith("interface ")) {
+            className = className.substring(10);
+        }
+        try {
+            return Class.forName(className);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private static Class getClassFromObject(final Object obj) {
+        Class objClass = obj.getClass();
+        if (objClass.isAnonymousClass() || objClass.isSynthetic()) {
+            Type[] genericInterfaces = objClass.getGenericInterfaces();
+            String className;
+            if (genericInterfaces.length == 1) {// interface
+                Type type = genericInterfaces[0];
+                while (type instanceof ParameterizedType) {
+                    type = ((ParameterizedType) type).getRawType();
+                }
+                className = type.toString();
+            } else {// abstract class or lambda
+                Type type = objClass.getGenericSuperclass();
+                while (type instanceof ParameterizedType) {
+                    type = ((ParameterizedType) type).getRawType();
+                }
+                className = type.toString();
+            }
+
+            if (className.startsWith("class ")) {
+                className = className.substring(6);
+            } else if (className.startsWith("interface ")) {
+                className = className.substring(10);
+            }
+            try {
+                return Class.forName(className);
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+        return objClass;
+    }
+
+    @IntDef({V, D, I, W, E, A})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface TYPE {
+    }
+
+    public interface IFileWriter {
+        void write(String file, String content);
+    }
+
     public static final class Config {
-        private String      mDefaultDir;// The default storage directory of log.
-        private String      mDir;       // The storage directory of log.
-        private String      mFilePrefix        = "util";// The file prefix of log.
-        private String      mFileExtension     = ".txt";// The file extension of log.
-        private boolean     mLogSwitch         = true;  // The switch of log.
-        private boolean     mLog2ConsoleSwitch = true;  // The logcat's switch of log.
-        private String      mGlobalTag         = "";    // The global tag of log.
-        private boolean     mTagIsSpace        = true;  // The global tag is space.
-        private boolean     mLogHeadSwitch     = true;  // The head's switch of log.
-        private boolean     mLog2FileSwitch    = false; // The file's switch of log.
-        private boolean     mLogBorderSwitch   = true;  // The border's switch of log.
-        private boolean     mSingleTagSwitch   = true;  // The single tag of log.
-        private int         mConsoleFilter     = V;     // The console's filter of log.
-        private int         mFileFilter        = V;     // The file's filter of log.
-        private int         mStackDeep         = 1;     // The stack's deep of log.
-        private int         mStackOffset       = 0;     // The stack's offset of log.
-        private int         mSaveDays          = -1;    // The save days of log.
-        private String      mProcessName       = Utils.getCurrentProcessName();
+        private String mDefaultDir;// The default storage directory of log.
+        private String mDir;       // The storage directory of log.
+        private String mFilePrefix = "util";// The file prefix of log.
+        private String mFileExtension = ".txt";// The file extension of log.
+        private boolean mLogSwitch = true;  // The switch of log.
+        private boolean mLog2ConsoleSwitch = true;  // The logcat's switch of log.
+        private String mGlobalTag = "";    // The global tag of log.
+        private boolean mTagIsSpace = true;  // The global tag is space.
+        private boolean mLogHeadSwitch = true;  // The head's switch of log.
+        private boolean mLog2FileSwitch = false; // The file's switch of log.
+        private boolean mLogBorderSwitch = true;  // The border's switch of log.
+        private boolean mSingleTagSwitch = true;  // The single tag of log.
+        private int mConsoleFilter = V;     // The console's filter of log.
+        private int mFileFilter = V;     // The file's filter of log.
+        private int mStackDeep = 1;     // The stack's deep of log.
+        private int mStackOffset = 0;     // The stack's offset of log.
+        private int mSaveDays = -1;    // The save days of log.
+        private String mProcessName = Utils.getCurrentProcessName();
         private IFileWriter mFileWriter;
 
         private Config() {
@@ -677,105 +734,13 @@ public final class LogUtils {
             }
         }
 
-        public final Config setLogSwitch(final boolean logSwitch) {
-            mLogSwitch = logSwitch;
-            return this;
-        }
-
         public final Config setConsoleSwitch(final boolean consoleSwitch) {
             mLog2ConsoleSwitch = consoleSwitch;
             return this;
         }
 
-        public final Config setGlobalTag(final String tag) {
-            if (isSpace(tag)) {
-                mGlobalTag = "";
-                mTagIsSpace = true;
-            } else {
-                mGlobalTag = tag;
-                mTagIsSpace = false;
-            }
-            return this;
-        }
-
-        public final Config setLogHeadSwitch(final boolean logHeadSwitch) {
-            mLogHeadSwitch = logHeadSwitch;
-            return this;
-        }
-
-        public final Config setLog2FileSwitch(final boolean log2FileSwitch) {
-            mLog2FileSwitch = log2FileSwitch;
-            return this;
-        }
-
-        public final Config setDir(final String dir) {
-            if (isSpace(dir)) {
-                mDir = null;
-            } else {
-                mDir = dir.endsWith(FILE_SEP) ? dir : dir + FILE_SEP;
-            }
-            return this;
-        }
-
-        public final Config setDir(final File dir) {
-            mDir = dir == null ? null : (dir.getAbsolutePath() + FILE_SEP);
-            return this;
-        }
-
-        public final Config setFilePrefix(final String filePrefix) {
-            if (isSpace(filePrefix)) {
-                mFilePrefix = "util";
-            } else {
-                mFilePrefix = filePrefix;
-            }
-            return this;
-        }
-
-        public final Config setFileExtension(final String fileExtension) {
-            if (isSpace(fileExtension)) {
-                mFileExtension = ".txt";
-            } else {
-                if (fileExtension.startsWith(".")) {
-                    mFileExtension = fileExtension;
-                } else {
-                    mFileExtension = "." + fileExtension;
-                }
-            }
-            return this;
-        }
-
         public final Config setBorderSwitch(final boolean borderSwitch) {
             mLogBorderSwitch = borderSwitch;
-            return this;
-        }
-
-        public final Config setSingleTagSwitch(final boolean singleTagSwitch) {
-            mSingleTagSwitch = singleTagSwitch;
-            return this;
-        }
-
-        public final Config setConsoleFilter(@TYPE final int consoleFilter) {
-            mConsoleFilter = consoleFilter;
-            return this;
-        }
-
-        public final Config setFileFilter(@TYPE final int fileFilter) {
-            mFileFilter = fileFilter;
-            return this;
-        }
-
-        public final Config setStackDeep(@IntRange(from = 1) final int stackDeep) {
-            mStackDeep = stackDeep;
-            return this;
-        }
-
-        public final Config setStackOffset(@IntRange(from = 0) final int stackOffset) {
-            mStackOffset = stackOffset;
-            return this;
-        }
-
-        public final Config setSaveDays(@IntRange(from = 1) final int saveDays) {
-            mSaveDays = saveDays;
             return this;
         }
 
@@ -804,16 +769,57 @@ public final class LogUtils {
             return mDir == null ? mDefaultDir : mDir;
         }
 
+        public final Config setDir(final String dir) {
+            if (isSpace(dir)) {
+                mDir = null;
+            } else {
+                mDir = dir.endsWith(FILE_SEP) ? dir : dir + FILE_SEP;
+            }
+            return this;
+        }
+
+        public final Config setDir(final File dir) {
+            mDir = dir == null ? null : (dir.getAbsolutePath() + FILE_SEP);
+            return this;
+        }
+
         public final String getFilePrefix() {
             return mFilePrefix;
+        }
+
+        public final Config setFilePrefix(final String filePrefix) {
+            if (isSpace(filePrefix)) {
+                mFilePrefix = "util";
+            } else {
+                mFilePrefix = filePrefix;
+            }
+            return this;
         }
 
         public final String getFileExtension() {
             return mFileExtension;
         }
 
+        public final Config setFileExtension(final String fileExtension) {
+            if (isSpace(fileExtension)) {
+                mFileExtension = ".txt";
+            } else {
+                if (fileExtension.startsWith(".")) {
+                    mFileExtension = fileExtension;
+                } else {
+                    mFileExtension = "." + fileExtension;
+                }
+            }
+            return this;
+        }
+
         public final boolean isLogSwitch() {
             return mLogSwitch;
+        }
+
+        public final Config setLogSwitch(final boolean logSwitch) {
+            mLogSwitch = logSwitch;
+            return this;
         }
 
         public final boolean isLog2ConsoleSwitch() {
@@ -825,12 +831,33 @@ public final class LogUtils {
             return mGlobalTag;
         }
 
+        public final Config setGlobalTag(final String tag) {
+            if (isSpace(tag)) {
+                mGlobalTag = "";
+                mTagIsSpace = true;
+            } else {
+                mGlobalTag = tag;
+                mTagIsSpace = false;
+            }
+            return this;
+        }
+
         public final boolean isLogHeadSwitch() {
             return mLogHeadSwitch;
         }
 
+        public final Config setLogHeadSwitch(final boolean logHeadSwitch) {
+            mLogHeadSwitch = logHeadSwitch;
+            return this;
+        }
+
         public final boolean isLog2FileSwitch() {
             return mLog2FileSwitch;
+        }
+
+        public final Config setLog2FileSwitch(final boolean log2FileSwitch) {
+            mLog2FileSwitch = log2FileSwitch;
+            return this;
         }
 
         public final boolean isLogBorderSwitch() {
@@ -841,24 +868,54 @@ public final class LogUtils {
             return mSingleTagSwitch;
         }
 
+        public final Config setSingleTagSwitch(final boolean singleTagSwitch) {
+            mSingleTagSwitch = singleTagSwitch;
+            return this;
+        }
+
         public final char getConsoleFilter() {
             return T[mConsoleFilter - V];
+        }
+
+        public final Config setConsoleFilter(@TYPE final int consoleFilter) {
+            mConsoleFilter = consoleFilter;
+            return this;
         }
 
         public final char getFileFilter() {
             return T[mFileFilter - V];
         }
 
+        public final Config setFileFilter(@TYPE final int fileFilter) {
+            mFileFilter = fileFilter;
+            return this;
+        }
+
         public final int getStackDeep() {
             return mStackDeep;
+        }
+
+        public final Config setStackDeep(@IntRange(from = 1) final int stackDeep) {
+            mStackDeep = stackDeep;
+            return this;
         }
 
         public final int getStackOffset() {
             return mStackOffset;
         }
 
+        public final Config setStackOffset(@IntRange(from = 0) final int stackOffset) {
+            mStackOffset = stackOffset;
+            return this;
+        }
+
         public final int getSaveDays() {
             return mSaveDays;
+        }
+
+        public final Config setSaveDays(@IntRange(from = 1) final int saveDays) {
+            mSaveDays = saveDays;
+            return this;
         }
 
         @Override
@@ -886,14 +943,10 @@ public final class LogUtils {
         public abstract String format(T t);
     }
 
-    public interface IFileWriter {
-        void write(String file, String content);
-    }
-
     private final static class TagHead {
-        String   tag;
+        String tag;
         String[] consoleHead;
-        String   fileHead;
+        String fileHead;
 
         TagHead(String tag, String[] consoleHead, String fileHead) {
             this.tag = tag;
@@ -1098,7 +1151,7 @@ public final class LogUtils {
         private static String object2Json(Object object) {
             if (object instanceof CharSequence) {
                 return formatJson(object.toString());
-            }else {
+            } else {
                 return "";
             }
         }
@@ -1158,64 +1211,5 @@ public final class LogUtils {
             }
             throw new IllegalArgumentException("Array has incompatible type: " + object.getClass());
         }
-    }
-
-    private static <T> Class getTypeClassFromParadigm(final IFormatter<T> formatter) {
-        Type[] genericInterfaces = formatter.getClass().getGenericInterfaces();
-        Type type;
-        if (genericInterfaces.length == 1) {
-            type = genericInterfaces[0];
-        } else {
-            type = formatter.getClass().getGenericSuperclass();
-        }
-        type = ((ParameterizedType) type).getActualTypeArguments()[0];
-        while (type instanceof ParameterizedType) {
-            type = ((ParameterizedType) type).getRawType();
-        }
-        String className = type.toString();
-        if (className.startsWith("class ")) {
-            className = className.substring(6);
-        } else if (className.startsWith("interface ")) {
-            className = className.substring(10);
-        }
-        try {
-            return Class.forName(className);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    private static Class getClassFromObject(final Object obj) {
-        Class objClass = obj.getClass();
-        if (objClass.isAnonymousClass() || objClass.isSynthetic()) {
-            Type[] genericInterfaces = objClass.getGenericInterfaces();
-            String className;
-            if (genericInterfaces.length == 1) {// interface
-                Type type = genericInterfaces[0];
-                while (type instanceof ParameterizedType) {
-                    type = ((ParameterizedType) type).getRawType();
-                }
-                className = type.toString();
-            } else {// abstract class or lambda
-                Type type = objClass.getGenericSuperclass();
-                while (type instanceof ParameterizedType) {
-                    type = ((ParameterizedType) type).getRawType();
-                }
-                className = type.toString();
-            }
-
-            if (className.startsWith("class ")) {
-                className = className.substring(6);
-            } else if (className.startsWith("interface ")) {
-                className = className.substring(10);
-            }
-            try {
-                return Class.forName(className);
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            }
-        }
-        return objClass;
     }
 }

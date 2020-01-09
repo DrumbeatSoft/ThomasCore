@@ -29,12 +29,12 @@ import java.io.UnsupportedEncodingException;
  * @since 1.0.0
  */
 public final class ConvertUtils {
+    private static final char[] hexDigits =
+            {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+
     private ConvertUtils() {
         throw new UnsupportedOperationException("u can't instantiate me...");
     }
-
-    private static final char[] hexDigits =
-            {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
 
     /**
      * Bytes to bits.
@@ -318,17 +318,6 @@ public final class ConvertUtils {
                 e.printStackTrace();
             }
         }
-    }
-
-    /**
-     * Output stream to input stream.
-     *
-     * @param out The output stream.
-     * @return input stream
-     */
-    public ByteArrayInputStream output2InputStream(final OutputStream out) {
-        if (out == null) return null;
-        return new ByteArrayInputStream(((ByteArrayOutputStream) out).toByteArray());
     }
 
     /**
@@ -622,10 +611,6 @@ public final class ConvertUtils {
         return (int) (pxValue / fontScale + 0.5f);
     }
 
-    ///////////////////////////////////////////////////////////////////////////
-    // other utils methods
-    ///////////////////////////////////////////////////////////////////////////
-
     private static boolean isSpace(final String s) {
         if (s == null) return true;
         for (int i = 0, len = s.length(); i < len; ++i) {
@@ -634,5 +619,20 @@ public final class ConvertUtils {
             }
         }
         return true;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // other utils methods
+    ///////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Output stream to input stream.
+     *
+     * @param out The output stream.
+     * @return input stream
+     */
+    public ByteArrayInputStream output2InputStream(final OutputStream out) {
+        if (out == null) return null;
+        return new ByteArrayInputStream(((ByteArrayOutputStream) out).toByteArray());
     }
 }

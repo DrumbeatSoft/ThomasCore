@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Set;
 
 import static android.Manifest.permission.KILL_BACKGROUND_PROCESSES;
+
 /**
  * @author Thomas
  * @describe 进程工具类

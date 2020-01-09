@@ -31,6 +31,7 @@ import androidx.annotation.NonNull;
  */
 public final class KeyboardUtils {
     private static final int TAG_ON_GLOBAL_LAYOUT_LISTENER = -8;
+    private static int sDecorViewDelta = 0;
 
     private KeyboardUtils() {
         throw new UnsupportedOperationException("u can't instantiate me...");
@@ -123,8 +124,6 @@ public final class KeyboardUtils {
         if (imm == null) return;
         imm.toggleSoftInput(0, 0);
     }
-
-    private static int sDecorViewDelta = 0;
 
     /**
      * Return whether soft input is visible.

@@ -3,6 +3,7 @@ package com.thomas.core.utils;
 import android.os.Environment;
 
 import java.io.File;
+
 /**
  * @author Thomas
  * @describe 清理工具类
@@ -106,18 +107,28 @@ public final class CleanUtils {
     ///////////////////////////////////////////////////////////////////////////
 
     private static boolean deleteFilesInDir(final File dir) {
-        if (dir == null) {return false;}
+        if (dir == null) {
+            return false;
+        }
         // dir doesn't exist then return true
-        if (!dir.exists()) {return true;}
+        if (!dir.exists()) {
+            return true;
+        }
         // dir isn't a directory then return false
-        if (!dir.isDirectory()) {return false;}
+        if (!dir.isDirectory()) {
+            return false;
+        }
         File[] files = dir.listFiles();
         if (files != null && files.length != 0) {
             for (File file : files) {
                 if (file.isFile()) {
-                    if (!file.delete()){ return false;}
+                    if (!file.delete()) {
+                        return false;
+                    }
                 } else if (file.isDirectory()) {
-                    if (!deleteDir(file)) {return false;}
+                    if (!deleteDir(file)) {
+                        return false;
+                    }
                 }
             }
         }
@@ -125,18 +136,28 @@ public final class CleanUtils {
     }
 
     private static boolean deleteDir(final File dir) {
-        if (dir == null) {return false;}
+        if (dir == null) {
+            return false;
+        }
         // dir doesn't exist then return true
-        if (!dir.exists()) {return true;}
+        if (!dir.exists()) {
+            return true;
+        }
         // dir isn't a directory then return false
-        if (!dir.isDirectory()) {return false;}
+        if (!dir.isDirectory()) {
+            return false;
+        }
         File[] files = dir.listFiles();
         if (files != null && files.length != 0) {
             for (File file : files) {
                 if (file.isFile()) {
-                    if (!file.delete()) {return false;}
+                    if (!file.delete()) {
+                        return false;
+                    }
                 } else if (file.isDirectory()) {
-                    if (!deleteDir(file)) {return false;}
+                    if (!deleteDir(file)) {
+                        return false;
+                    }
                 }
             }
         }
@@ -148,7 +169,9 @@ public final class CleanUtils {
     }
 
     private static boolean isSpace(final String s) {
-        if (s == null) {return true;}
+        if (s == null) {
+            return true;
+        }
         for (int i = 0, len = s.length(); i < len; ++i) {
             if (!Character.isWhitespace(s.charAt(i))) {
                 return false;

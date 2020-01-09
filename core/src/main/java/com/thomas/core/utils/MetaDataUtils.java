@@ -10,6 +10,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.ServiceInfo;
 
 import androidx.annotation.NonNull;
+
 /**
  * @author Thomas
  * @describe

@@ -68,7 +68,9 @@ public abstract class BaseActivity extends AppCompatActivity implements IBaseVie
 
     @Override
     public void setContentView() {
-        if (bindLayout() <= 0) {return;}
+        if (bindLayout() <= 0) {
+            return;
+        }
         mContentView = LayoutInflater.from(this).inflate(bindLayout(), null);
         setContentView(mContentView);
     }

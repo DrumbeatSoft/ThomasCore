@@ -44,7 +44,7 @@ public class NotificationsFragment extends BaseDemoFragment {
 
     @Override
     public void doBusiness() {
-        LogUtils.e(getClass().getSimpleName()+"可见");
+        LogUtils.e(getClass().getSimpleName() + "可见");
     }
 
     @Override

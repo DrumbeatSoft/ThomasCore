@@ -58,26 +58,23 @@ public class ShadowUtils {
     public static class Config {
 
         private static final int SHADOW_COLOR_DEFAULT = 0xb0_000000;
-        private static final int SHADOW_SIZE          = dp2px(8);
+        private static final int SHADOW_SIZE = dp2px(8);
 
-        private float   mShadowRadius         = -1;
-        private float   mShadowSizeNormal     = -1;
-        private float   mShadowSizePressed    = -1;
-        private float   mShadowMaxSizeNormal  = -1;
-        private float   mShadowMaxSizePressed = -1;
-        private int     mShadowColorNormal    = SHADOW_COLOR_DEFAULT;
-        private int     mShadowColorPressed   = SHADOW_COLOR_DEFAULT;
-        private boolean isCircle              = false;
+        private float mShadowRadius = -1;
+        private float mShadowSizeNormal = -1;
+        private float mShadowSizePressed = -1;
+        private float mShadowMaxSizeNormal = -1;
+        private float mShadowMaxSizePressed = -1;
+        private int mShadowColorNormal = SHADOW_COLOR_DEFAULT;
+        private int mShadowColorPressed = SHADOW_COLOR_DEFAULT;
+        private boolean isCircle = false;
 
         public Config() {
         }
 
-        public Config setShadowRadius(float radius) {
-            this.mShadowRadius = radius;
-            if (isCircle) {
-                throw new IllegalArgumentException("Set circle needn't set radius.");
-            }
-            return this;
+        private static int dp2px(final float dpValue) {
+            final float scale = Resources.getSystem().getDisplayMetrics().density;
+            return (int) (dpValue * scale + 0.5f);
         }
 
         public Config setCircle() {
@@ -143,6 +140,14 @@ public class ShadowUtils {
             return mShadowRadius;
         }
 
+        public Config setShadowRadius(float radius) {
+            this.mShadowRadius = radius;
+            if (isCircle) {
+                throw new IllegalArgumentException("Set circle needn't set radius.");
+            }
+            return this;
+        }
+
         private float getShadowSizeNormal() {
             if (mShadowSizeNormal == -1) {
                 mShadowSizeNormal = SHADOW_SIZE;
@@ -170,47 +175,31 @@ public class ShadowUtils {
             }
             return mShadowMaxSizePressed;
         }
-
-        private static int dp2px(final float dpValue) {
-            final float scale = Resources.getSystem().getDisplayMetrics().density;
-            return (int) (dpValue * scale + 0.5f);
-        }
     }
 
     public static class ShadowDrawable extends DrawableWrapper {
         // used to calculate content padding
         private static final double COS_45 = Math.cos(Math.toRadians(45));
-
+        private final int mShadowStartColor;
+        private final int mShadowEndColor;
         private float mShadowMultiplier = 1f;
-
-        private float mShadowTopScale    = 1f;
-        private float mShadowHorizScale  = 1f;
+        private float mShadowTopScale = 1f;
+        private float mShadowHorizScale = 1f;
         private float mShadowBottomScale = 1f;
-
         private Paint mCornerShadowPaint;
         private Paint mEdgeShadowPaint;
-
         private RectF mContentBounds;
-
         private float mCornerRadius;
-
         private Path mCornerShadowPath;
-
         // updated value with inset
         private float mMaxShadowSize;
         // actual value set by developer
         private float mRawMaxShadowSize;
-
         // multiplied value to account for shadow offset
         private float mShadowSize;
         // actual value set by developer
         private float mRawShadowSize;
-
         private boolean mDirty = true;
-
-        private final int mShadowStartColor;
-        private final int mShadowEndColor;
-
         private boolean mAddPaddingForCorners = false;
 
         private float mRotation;
@@ -245,6 +234,15 @@ public class ShadowUtils {
         private static int toEven(float value) {
             int i = Math.round(value);
             return (i % 2 == 1) ? i - 1 : i;
+        }
+
+        private static float calculateHorizontalPadding(float maxShadowSize, float cornerRadius,
+                                                        boolean addPaddingForCorners) {
+            if (addPaddingForCorners) {
+                return (float) (maxShadowSize + (1 - COS_45) * cornerRadius);
+            } else {
+                return maxShadowSize;
+            }
         }
 
         public void setAddPaddingForCorners(boolean addPaddingForCorners) {
@@ -303,28 +301,9 @@ public class ShadowUtils {
             }
         }
 
-        private static float calculateHorizontalPadding(float maxShadowSize, float cornerRadius,
-                                                        boolean addPaddingForCorners) {
-            if (addPaddingForCorners) {
-                return (float) (maxShadowSize + (1 - COS_45) * cornerRadius);
-            } else {
-                return maxShadowSize;
-            }
-        }
-
         @Override
         public int getOpacity() {
             return PixelFormat.TRANSLUCENT;
-        }
-
-        public void setCornerRadius(float radius) {
-            radius = Math.round(radius);
-            if (mCornerRadius == radius) {
-                return;
-            }
-            mCornerRadius = radius;
-            mDirty = true;
-            invalidateSelf();
         }
 
         @Override
@@ -517,20 +496,30 @@ public class ShadowUtils {
             return mCornerRadius;
         }
 
-        public void setShadowSize(float size) {
-            setShadowSize(size, mRawMaxShadowSize);
-        }
-
-        public void setMaxShadowSize(float size) {
-            setShadowSize(mRawShadowSize, size);
+        public void setCornerRadius(float radius) {
+            radius = Math.round(radius);
+            if (mCornerRadius == radius) {
+                return;
+            }
+            mCornerRadius = radius;
+            mDirty = true;
+            invalidateSelf();
         }
 
         public float getShadowSize() {
             return mRawShadowSize;
         }
 
+        public void setShadowSize(float size) {
+            setShadowSize(size, mRawMaxShadowSize);
+        }
+
         public float getMaxShadowSize() {
             return mRawMaxShadowSize;
+        }
+
+        public void setMaxShadowSize(float size) {
+            setShadowSize(mRawShadowSize, size);
         }
 
         public float getMinWidth() {
@@ -564,13 +553,13 @@ public class ShadowUtils {
         }
 
         @Override
-        public void setChangingConfigurations(int configs) {
-            this.mDrawable.setChangingConfigurations(configs);
+        public int getChangingConfigurations() {
+            return this.mDrawable.getChangingConfigurations();
         }
 
         @Override
-        public int getChangingConfigurations() {
-            return this.mDrawable.getChangingConfigurations();
+        public void setChangingConfigurations(int configs) {
+            this.mDrawable.setChangingConfigurations(configs);
         }
 
         @Override
@@ -679,13 +668,13 @@ public class ShadowUtils {
         }
 
         @Override
-        public void setAutoMirrored(boolean mirrored) {
-            DrawableCompat.setAutoMirrored(this.mDrawable, mirrored);
+        public boolean isAutoMirrored() {
+            return DrawableCompat.isAutoMirrored(this.mDrawable);
         }
 
         @Override
-        public boolean isAutoMirrored() {
-            return DrawableCompat.isAutoMirrored(this.mDrawable);
+        public void setAutoMirrored(boolean mirrored) {
+            DrawableCompat.setAutoMirrored(this.mDrawable, mirrored);
         }
 
         @Override

@@ -24,17 +24,13 @@ import com.thomas.core.utils.ClickUtils;
  */
 public abstract class LazyFragment extends Fragment implements IBaseView {
 
-    private boolean isFirstVisible = true;
-    private boolean isFirstInvisible = true;
-
     private static final String STATE_SAVE_IS_HIDDEN = "STATE_SAVE_IS_HIDDEN";
-
-    private View.OnClickListener mClickListener = v -> onThomasClick(v);
-
     protected AppCompatActivity mActivity;
     protected LayoutInflater mInflater;
     protected View mContentView;
-
+    private boolean isFirstVisible = true;
+    private boolean isFirstInvisible = true;
+    private View.OnClickListener mClickListener = v -> onThomasClick(v);
 
     @Override
     public void onAttach(Context context) {
@@ -143,7 +139,6 @@ public abstract class LazyFragment extends Fragment implements IBaseView {
         }
         return mContentView.findViewById(id);
     }
-
 
 
     @Override

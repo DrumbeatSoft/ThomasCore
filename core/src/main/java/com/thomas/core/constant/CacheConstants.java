@@ -8,8 +8,8 @@ package com.thomas.core.constant;
  * @since 1.0.0
  */
 public interface CacheConstants {
-    int SEC  = 1;
-    int MIN  = 60;
+    int SEC = 1;
+    int MIN = 60;
     int HOUR = 3600;
-    int DAY  = 86400;
+    int DAY = 86400;
 }

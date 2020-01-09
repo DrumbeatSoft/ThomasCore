@@ -38,6 +38,7 @@ public class DashboardViewModel extends ViewModel {
         mTitles.add("VibrateUtils");
         mTexts.setValue(mTitles);
     }
+
     public LiveData<List<String>> getTexts() {
         return mTexts;
     }

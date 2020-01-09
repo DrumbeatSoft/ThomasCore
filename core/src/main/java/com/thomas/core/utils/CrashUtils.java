@@ -26,6 +26,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
+
 /**
  * @author Thomas
  * @describe
@@ -34,18 +35,15 @@ import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
  * @since 1.0.0
  */
 public final class CrashUtils {
+    private static final String FILE_SEP = System.getProperty("file.separator");
+    @SuppressLint("SimpleDateFormat")
+    private static final Format FORMAT = new SimpleDateFormat("MM-dd_HH-mm-ss");
+    private static final UncaughtExceptionHandler DEFAULT_UNCAUGHT_EXCEPTION_HANDLER;
+    private static final UncaughtExceptionHandler UNCAUGHT_EXCEPTION_HANDLER;
     private static String defaultDir;
     private static String dir;
     private static String versionName;
-    private static int    versionCode;
-
-    private static final String FILE_SEP = System.getProperty("file.separator");
-    @SuppressLint("SimpleDateFormat")
-    private static final Format FORMAT   = new SimpleDateFormat("MM-dd_HH-mm-ss");
-
-    private static final UncaughtExceptionHandler DEFAULT_UNCAUGHT_EXCEPTION_HANDLER;
-    private static final UncaughtExceptionHandler UNCAUGHT_EXCEPTION_HANDLER;
-
+    private static int versionCode;
     private static OnCrashListener sOnCrashListener;
 
     static {
@@ -193,14 +191,6 @@ public final class CrashUtils {
     // interface
     ///////////////////////////////////////////////////////////////////////////
 
-    public interface OnCrashListener {
-        void onCrash(String crashInfo, Throwable e);
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // other utils methods
-    ///////////////////////////////////////////////////////////////////////////
-
     private static void input2File(final String input, final String filePath) {
         Future<Boolean> submit = Executors.newSingleThreadExecutor().submit(new Callable<Boolean>() {
             @Override
@@ -234,6 +224,10 @@ public final class CrashUtils {
         Log.e("CrashUtils", "write crash info to " + filePath + " failed!");
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    // other utils methods
+    ///////////////////////////////////////////////////////////////////////////
+
     private static boolean createOrExistsFile(final String filePath) {
         File file = new File(filePath);
         if (file.exists()) return file.isFile();
@@ -258,5 +252,9 @@ public final class CrashUtils {
             }
         }
         return true;
+    }
+
+    public interface OnCrashListener {
+        void onCrash(String crashInfo, Throwable e);
     }
 }

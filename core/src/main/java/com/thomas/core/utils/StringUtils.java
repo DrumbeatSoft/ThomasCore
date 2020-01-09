@@ -4,6 +4,7 @@ import android.content.res.Resources;
 
 import androidx.annotation.ArrayRes;
 import androidx.annotation.StringRes;
+
 /**
  * @author Thomas
  * @describe 字符串工具类
@@ -43,7 +44,9 @@ public final class StringUtils {
      * @return {@code true}: yes<br> {@code false}: no
      */
     public static boolean isSpace(final String s) {
-        if (s == null) {return true;}
+        if (s == null) {
+            return true;
+        }
         for (int i = 0, len = s.length(); i < len; ++i) {
             if (!Character.isWhitespace(s.charAt(i))) {
                 return false;
@@ -60,14 +63,18 @@ public final class StringUtils {
      * @return {@code true}: yes<br>{@code false}: no
      */
     public static boolean equals(final CharSequence s1, final CharSequence s2) {
-        if (s1 == s2) {return true;}
+        if (s1 == s2) {
+            return true;
+        }
         int length;
         if (s1 != null && s2 != null && (length = s1.length()) == s2.length()) {
             if (s1 instanceof String && s2 instanceof String) {
                 return s1.equals(s2);
             } else {
                 for (int i = 0; i < length; i++) {
-                    if (s1.charAt(i) != s2.charAt(i)) {return false;}
+                    if (s1.charAt(i) != s2.charAt(i)) {
+                        return false;
+                    }
                 }
                 return true;
             }
@@ -113,8 +120,12 @@ public final class StringUtils {
      * @return the string with first letter upper.
      */
     public static String upperFirstLetter(final String s) {
-        if (s == null || s.length() == 0) {return "";}
-        if (!Character.isLowerCase(s.charAt(0))) {return s;}
+        if (s == null || s.length() == 0) {
+            return "";
+        }
+        if (!Character.isLowerCase(s.charAt(0))) {
+            return s;
+        }
         return String.valueOf((char) (s.charAt(0) - 32)) + s.substring(1);
     }
 
@@ -125,8 +136,12 @@ public final class StringUtils {
      * @return the string with first letter lower.
      */
     public static String lowerFirstLetter(final String s) {
-        if (s == null || s.length() == 0) {return "";}
-        if (!Character.isUpperCase(s.charAt(0))) {return s;}
+        if (s == null || s.length() == 0) {
+            return "";
+        }
+        if (!Character.isUpperCase(s.charAt(0))) {
+            return s;
+        }
         return String.valueOf((char) (s.charAt(0) + 32)) + s.substring(1);
     }
 
@@ -137,9 +152,13 @@ public final class StringUtils {
      * @return the reverse string.
      */
     public static String reverse(final String s) {
-        if (s == null) {return "";}
+        if (s == null) {
+            return "";
+        }
         int len = s.length();
-        if (len <= 1) {return s;}
+        if (len <= 1) {
+            return s;
+        }
         int mid = len >> 1;
         char[] chars = s.toCharArray();
         char c;
@@ -158,7 +177,9 @@ public final class StringUtils {
      * @return the DBC string
      */
     public static String toDBC(final String s) {
-        if (s == null || s.length() == 0) {return "";}
+        if (s == null || s.length() == 0) {
+            return "";
+        }
         char[] chars = s.toCharArray();
         for (int i = 0, len = chars.length; i < len; i++) {
             if (chars[i] == 12288) {
@@ -179,7 +200,9 @@ public final class StringUtils {
      * @return the SBC string
      */
     public static String toSBC(final String s) {
-        if (s == null || s.length() == 0) {return "";}
+        if (s == null || s.length() == 0) {
+            return "";
+        }
         char[] chars = s.toCharArray();
         for (int i = 0, len = chars.length; i < len; i++) {
             if (chars[i] == ' ') {

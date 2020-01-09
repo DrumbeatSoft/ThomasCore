@@ -16,6 +16,7 @@ import java.lang.reflect.Method;
 
 import static android.Manifest.permission.CALL_PHONE;
 import static android.Manifest.permission.READ_PHONE_STATE;
+
 /**
  * @author Thomas
  * @describe 手机工具类
@@ -54,10 +55,14 @@ public final class PhoneUtils {
         }
         TelephonyManager tm = getTelephonyManager();
         String deviceId = tm.getDeviceId();
-        if (!TextUtils.isEmpty(deviceId)) {return deviceId;}
+        if (!TextUtils.isEmpty(deviceId)) {
+            return deviceId;
+        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             String imei = tm.getImei();
-            if (!TextUtils.isEmpty(imei)) {return imei;}
+            if (!TextUtils.isEmpty(imei)) {
+                return imei;
+            }
             String meid = tm.getMeid();
             return TextUtils.isEmpty(meid) ? "" : meid;
         }
@@ -171,7 +176,9 @@ public final class PhoneUtils {
     private static String getMinOne(String s0, String s1) {
         boolean empty0 = TextUtils.isEmpty(s0);
         boolean empty1 = TextUtils.isEmpty(s1);
-        if (empty0 && empty1) {return "";}
+        if (empty0 && empty1) {
+            return "";
+        }
         if (!empty0 && !empty1) {
             if (s0.compareTo(s1) <= 0) {
                 return s0;
@@ -179,7 +186,9 @@ public final class PhoneUtils {
                 return s1;
             }
         }
-        if (!empty0) {return s0;}
+        if (!empty0) {
+            return s0;
+        }
         return s1;
     }
 
@@ -249,7 +258,9 @@ public final class PhoneUtils {
     public static String getSimOperatorByMnc() {
         TelephonyManager tm = getTelephonyManager();
         String operator = tm.getSimOperator();
-        if (operator == null) {return "";}
+        if (operator == null) {
+            return "";
+        }
         switch (operator) {
             case "46000":
             case "46002":

@@ -69,77 +69,64 @@ import static android.graphics.BlurMaskFilter.Blur;
  */
 public final class SpanUtils {
 
-    private static final int COLOR_DEFAULT = 0xFEFFFFFF;
-
-    public static final int ALIGN_BOTTOM   = 0;
+    public static final int ALIGN_BOTTOM = 0;
     public static final int ALIGN_BASELINE = 1;
-    public static final int ALIGN_CENTER   = 2;
-    public static final int ALIGN_TOP      = 3;
-
-    @IntDef({ALIGN_BOTTOM, ALIGN_BASELINE, ALIGN_CENTER, ALIGN_TOP})
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface Align {
-    }
-
+    public static final int ALIGN_CENTER = 2;
+    public static final int ALIGN_TOP = 3;
+    private static final int COLOR_DEFAULT = 0xFEFFFFFF;
     private static final String LINE_SEPARATOR = System.getProperty("line.separator");
-
-    private TextView      mTextView;
-    private CharSequence  mText;
-    private int           flag;
-    private int           foregroundColor;
-    private int           backgroundColor;
-    private int           lineHeight;
-    private int           alignLine;
-    private int           quoteColor;
-    private int           stripeWidth;
-    private int           quoteGapWidth;
-    private int           first;
-    private int           rest;
-    private int           bulletColor;
-    private int           bulletRadius;
-    private int           bulletGapWidth;
-    private int           fontSize;
-    private boolean       fontSizeIsDp;
-    private float         proportion;
-    private float         xProportion;
-    private boolean       isStrikethrough;
-    private boolean       isUnderline;
-    private boolean       isSuperscript;
-    private boolean       isSubscript;
-    private boolean       isBold;
-    private boolean       isItalic;
-    private boolean       isBoldItalic;
-    private String        fontFamily;
-    private Typeface      typeface;
-    private Alignment     alignment;
-    private int           verticalAlign;
+    private final int mTypeCharSequence = 0;
+    private final int mTypeImage = 1;
+    private final int mTypeSpace = 2;
+    private TextView mTextView;
+    private CharSequence mText;
+    private int flag;
+    private int foregroundColor;
+    private int backgroundColor;
+    private int lineHeight;
+    private int alignLine;
+    private int quoteColor;
+    private int stripeWidth;
+    private int quoteGapWidth;
+    private int first;
+    private int rest;
+    private int bulletColor;
+    private int bulletRadius;
+    private int bulletGapWidth;
+    private int fontSize;
+    private boolean fontSizeIsDp;
+    private float proportion;
+    private float xProportion;
+    private boolean isStrikethrough;
+    private boolean isUnderline;
+    private boolean isSuperscript;
+    private boolean isSubscript;
+    private boolean isBold;
+    private boolean isItalic;
+    private boolean isBoldItalic;
+    private String fontFamily;
+    private Typeface typeface;
+    private Alignment alignment;
+    private int verticalAlign;
     private ClickableSpan clickSpan;
-    private String        url;
-    private float         blurRadius;
-    private Blur          style;
-    private Shader        shader;
-    private float         shadowRadius;
-    private float         shadowDx;
-    private float         shadowDy;
-    private int           shadowColor;
-    private Object[]      spans;
-
-    private Bitmap   imageBitmap;
+    private String url;
+    private float blurRadius;
+    private Blur style;
+    private Shader shader;
+    private float shadowRadius;
+    private float shadowDx;
+    private float shadowDy;
+    private int shadowColor;
+    private Object[] spans;
+    private Bitmap imageBitmap;
     private Drawable imageDrawable;
-    private Uri      imageUri;
-    private int      imageResourceId;
-    private int      alignImage;
-
+    private Uri imageUri;
+    private int imageResourceId;
+    private int alignImage;
     private int spaceSize;
     private int spaceColor;
-
     private SerializableSpannableStringBuilder mBuilder;
-
-    private       int mType;
-    private final int mTypeCharSequence = 0;
-    private final int mTypeImage        = 1;
-    private final int mTypeSpace        = 2;
-
+    private int mType;
     private SpanUtils(TextView textView) {
         this();
         mTextView = textView;
@@ -150,6 +137,10 @@ public final class SpanUtils {
         mText = "";
         mType = -1;
         setDefault();
+    }
+
+    public static SpanUtils with(final TextView textView) {
+        return new SpanUtils(textView);
     }
 
     private void setDefault() {
@@ -807,7 +798,9 @@ public final class SpanUtils {
     }
 
     private void updateCharCharSequence() {
-        if (mText.length() == 0) {return;}
+        if (mText.length() == 0) {
+            return;
+        }
         int start = mBuilder.length();
         if (start == 0 && lineHeight != -1) {// bug of LineHeightSpan when first line
             mBuilder.append(Character.toString((char) 2))
@@ -943,10 +936,15 @@ public final class SpanUtils {
         mBuilder.setSpan(new SpaceSpan(spaceSize, spaceColor), start, end, flag);
     }
 
+    @IntDef({ALIGN_BOTTOM, ALIGN_BASELINE, ALIGN_CENTER, ALIGN_TOP})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface Align {
+    }
+
     static class VerticalAlignSpan extends ReplacementSpan {
 
         static final int ALIGN_CENTER = 2;
-        static final int ALIGN_TOP    = 3;
+        static final int ALIGN_TOP = 3;
 
         final int mVerticalAlignment;
 
@@ -993,13 +991,11 @@ public final class SpanUtils {
 
     static class CustomLineHeightSpan implements LineHeightSpan {
 
-        private final int height;
-
         static final int ALIGN_CENTER = 2;
-        static final int ALIGN_TOP    = 3;
-
-        final  int                  mVerticalAlignment;
+        static final int ALIGN_TOP = 3;
         static Paint.FontMetricsInt sfm;
+        final int mVerticalAlignment;
+        private final int height;
 
         CustomLineHeightSpan(int height, int verticalAlignment) {
             this.height = height;
@@ -1055,7 +1051,7 @@ public final class SpanUtils {
 
     static class SpaceSpan extends ReplacementSpan {
 
-        private final int   width;
+        private final int width;
         private final Paint paint = new Paint();
 
         private SpaceSpan(final int width) {
@@ -1218,8 +1214,8 @@ public final class SpanUtils {
 
     static class CustomImageSpan extends CustomDynamicDrawableSpan {
         private Drawable mDrawable;
-        private Uri      mContentUri;
-        private int      mResourceId;
+        private Uri mContentUri;
+        private int mResourceId;
 
         private CustomImageSpan(final Bitmap b, final int verticalAlignment) {
             super(verticalAlignment);
@@ -1293,6 +1289,7 @@ public final class SpanUtils {
         static final int ALIGN_TOP = 3;
 
         final int mVerticalAlignment;
+        private WeakReference<Drawable> mDrawableRef;
 
         private CustomDynamicDrawableSpan() {
             mVerticalAlignment = ALIGN_BOTTOM;
@@ -1375,8 +1372,6 @@ public final class SpanUtils {
             }
             return d;
         }
-
-        private WeakReference<Drawable> mDrawableRef;
     }
 
     static class ShaderSpan extends CharacterStyle implements UpdateAppearance {
@@ -1413,17 +1408,13 @@ public final class SpanUtils {
         }
     }
 
-    private static class SerializableSpannableStringBuilder extends SpannableStringBuilder
-            implements Serializable {
-
-        private static final long serialVersionUID = 4909567650765875771L;
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     // static
     ///////////////////////////////////////////////////////////////////////////
 
-    public static SpanUtils with(final TextView textView) {
-        return new SpanUtils(textView);
+    private static class SerializableSpannableStringBuilder extends SpannableStringBuilder
+            implements Serializable {
+
+        private static final long serialVersionUID = 4909567650765875771L;
     }
 }
