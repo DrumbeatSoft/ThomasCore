@@ -130,11 +130,12 @@ public abstract class LazyFragment extends Fragment implements IBaseView {
 
     public void applyThomasClickListener(View... views) {
         ClickUtils.applyGlobalDebouncing(views, mClickListener);
-        ClickUtils.applyPressedViewScale(views);
+
     }
 
-    public void applyThomasOnlyClickListener(View... views) {
+    public void applyThomasClickScaleListener(View... views) {
         ClickUtils.applyGlobalDebouncing(views, mClickListener);
+        ClickUtils.applyPressedViewScale(views);
     }
 
     public <T extends View> T findViewById(@IdRes int id) {
