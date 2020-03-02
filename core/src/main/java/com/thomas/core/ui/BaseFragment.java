@@ -105,6 +105,9 @@ public abstract class BaseFragment extends Fragment implements IBaseView {
         ClickUtils.applyGlobalDebouncing(views, mClickListener);
         ClickUtils.applyPressedViewScale(views);
     }
+    public void applyThomasOnlyClickListener(View... views) {
+        ClickUtils.applyGlobalDebouncing(views, mClickListener);
+    }
 
     public <T extends View> T findViewById(@IdRes int id) {
         if (mContentView == null) {

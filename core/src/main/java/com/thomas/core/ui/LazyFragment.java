@@ -133,6 +133,10 @@ public abstract class LazyFragment extends Fragment implements IBaseView {
         ClickUtils.applyPressedViewScale(views);
     }
 
+    public void applyThomasOnlyClickListener(View... views) {
+        ClickUtils.applyGlobalDebouncing(views, mClickListener);
+    }
+
     public <T extends View> T findViewById(@IdRes int id) {
         if (mContentView == null) {
             throw new NullPointerException("ContentView is null.");
