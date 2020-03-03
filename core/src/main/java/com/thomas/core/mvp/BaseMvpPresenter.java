@@ -1,6 +1,9 @@
 package com.thomas.core.mvp;
 
 import java.lang.ref.WeakReference;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 
 /**
  * @author Thomas
@@ -10,7 +13,7 @@ import java.lang.ref.WeakReference;
  * @since 1.0.0
  */
 public abstract class BaseMvpPresenter<M extends IBaseMvpModel, V extends IBaseMvpView> {
-    private V view;
+    private V mProxyView;
     private M model;
     private WeakReference<V> weakReference;
 
@@ -18,10 +21,11 @@ public abstract class BaseMvpPresenter<M extends IBaseMvpModel, V extends IBaseM
      * 绑定View
      */
     public void attachView(V view) {
-        if (view != null) {
-            weakReference = new WeakReference<>(view);
-            this.view = weakReference.get();
-        }
+        weakReference = new WeakReference<>(view);
+        mProxyView = (V) Proxy.newProxyInstance(
+                view.getClass().getClassLoader(),
+                view.getClass().getInterfaces(),
+                new MvpViewHandler(weakReference.get()));
         if (model == null) {
             model = createModel();
         }
@@ -35,7 +39,6 @@ public abstract class BaseMvpPresenter<M extends IBaseMvpModel, V extends IBaseM
         if (isViewAttached()) {
             weakReference.clear();
             weakReference = null;
-            view = null;
         }
     }
 
@@ -47,11 +50,7 @@ public abstract class BaseMvpPresenter<M extends IBaseMvpModel, V extends IBaseM
     }
 
     protected V getView() {
-        if (view == null) {
-            throw new IllegalStateException("view not attached");
-        } else {
-            return view;
-        }
+        return mProxyView;
     }
 
     protected M getModel() {
@@ -62,5 +61,28 @@ public abstract class BaseMvpPresenter<M extends IBaseMvpModel, V extends IBaseM
      * 通过该方法创建Module
      */
     protected abstract M createModel();
+
+
+
+    /**
+     * View代理类  防止 页面关闭P异步操作调用V 方法 空指针问题
+     */
+    private class MvpViewHandler implements InvocationHandler {
+
+        private IBaseMvpView mvpView;
+
+        MvpViewHandler(IBaseMvpView mvpView) {
+            this.mvpView = mvpView;
+        }
+
+        @Override
+        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+            //如果V层没被销毁, 执行V层的方法.
+            if (isViewAttached()) {
+                return method.invoke(mvpView, args);
+            } //P层不需要关注V层的返回值
+            return null;
+        }
+    }
 
 }

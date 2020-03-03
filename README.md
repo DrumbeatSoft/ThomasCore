@@ -17,6 +17,6 @@
 2. Add the dependency in your module  `build.gradle`
 
     `` 
-    implementation 'com.github.ithomasoft:ThomasCore:1.2.3'
+    implementation 'com.github.ithomasoft:ThomasCore:1.2.4'
     ``
 

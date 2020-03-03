@@ -8,5 +8,12 @@ package com.thomas.core.mvp;
  * @since 1.0.0
  */
 public interface IBaseMvpView {
-    void onFailed(String failed);
+
+    /**
+     * 失败数据
+     * @param tag 标签
+     * @param failed 失败数据
+     */
+    void onFailed(Object tag,String failed);
+
 }
