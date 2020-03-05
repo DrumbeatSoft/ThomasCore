@@ -24,7 +24,7 @@ public abstract class ComponentApplication extends BaseApplication {
      * 组件化开发中各个模块中需要进行初始化的操作
      */
     protected void modulesApplicationInit() {
-        //用反射, 将 AndroidManifest.xml 中带有 ConfigModule 标签的 class 转成对象集合（List<ConfigModule>）
+        //用反射, 将 AndroidManifest.xml 中带有 ModuleConfig 标签的 class 转成对象集合（List<ModuleConfig>）
         mModules = new ManifestParser(Utils.getApp()).parse();
         //遍历之前获得的集合, 执行每一个 ConfigModule 实现类的某些方法
         for (ModuleConfig module : mModules) {
