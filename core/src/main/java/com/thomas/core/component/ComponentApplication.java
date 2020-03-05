@@ -16,9 +16,7 @@ public abstract class ComponentApplication extends BaseApplication {
     @Override
     public void onCreate() {
         super.onCreate();
-        if (ProcessUtils.isMainProcess()) {
-            modulesApplicationInit();
-        }
+        modulesApplicationInit();
     }
 
 
