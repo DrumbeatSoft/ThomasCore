@@ -15,8 +15,10 @@
 	maven { url 'https://jitpack.io' }
     ``
 2. Add the dependency in your module  `build.gradle`
+    > 请把{$latestVersion}替换成上面的标签中所示版本
+
 
     `` 
-    implementation 'com.github.ithomasoft:ThomasCore:1.2.7'
+    implementation 'com.github.ithomasoft:ThomasCore:{$latestVersion}'
     ``
 
