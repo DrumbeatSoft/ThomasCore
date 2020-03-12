@@ -2,3 +2,4 @@
 -keep public class * implements com.thomas.core.mvp.IBaseMvpModel
 -keep public class * implements com.thomas.core.mvp.IBaseMvpView
 -keep public class * extends com.thomas.core.mvp.BaseMvpPresenter
+-keep public class * implements com.thomas.core.component.ModuleConfig
