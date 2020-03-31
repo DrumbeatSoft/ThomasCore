@@ -94,7 +94,6 @@ public abstract class BaseActivity extends AppCompatActivity implements IBaseVie
     public Resources getResources() {
         if (isNeedAdapt()) {
             //今日头条屏幕适配方案
-
             if (ScreenUtils.isPortrait()) {
                 //竖屏以宽度为基准
                 return AdaptScreenUtils.adaptWidth(super.getResources(), setAdaptScreen());
@@ -107,7 +106,6 @@ public abstract class BaseActivity extends AppCompatActivity implements IBaseVie
             return super.getResources();
         }
     }
-
 
 
     @Override

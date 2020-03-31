@@ -3,8 +3,6 @@ package com.thomas.core.utils;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.ContextWrapper;
-import android.content.res.Resources;
 import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
@@ -22,6 +20,8 @@ import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
 
+import java.lang.reflect.Field;
+
 /**
  * @author Thomas
  * @describe 键盘工具类
@@ -30,11 +30,22 @@ import androidx.annotation.NonNull;
  * @since 1.0.0
  */
 public final class KeyboardUtils {
+
     private static final int TAG_ON_GLOBAL_LAYOUT_LISTENER = -8;
-    private static int sDecorViewDelta = 0;
 
     private KeyboardUtils() {
         throw new UnsupportedOperationException("u can't instantiate me...");
+    }
+
+    /**
+     * Show the soft input.
+     */
+    public static void showSoftInput() {
+        InputMethodManager imm = (InputMethodManager) Utils.getApp().getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (imm == null) {
+            return;
+        }
+        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
     }
 
     /**
@@ -94,7 +105,7 @@ public final class KeyboardUtils {
             if (focusView == null) {
                 view = new EditText(activity);
                 view.setTag("keyboardTagView");
-                ((ViewGroup) decorView).addView(view, 0, 0);
+                ((ViewGroup) decorView).addView(view, 1, 1);
             } else {
                 view = focusView;
             }
@@ -115,6 +126,22 @@ public final class KeyboardUtils {
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
+    private static long millis;
+
+    /**
+     * Hide the soft input.
+     *
+     * @param activity The activity.
+     */
+    public static void hideSoftInputByToggle(final Activity activity) {
+        long nowMillis = System.currentTimeMillis();
+        long delta = nowMillis - millis;
+        if (KeyboardUtils.isSoftInputVisible(activity) && Math.abs(delta) > 500) {
+            KeyboardUtils.toggleSoftInput();
+        }
+        millis = nowMillis;
+    }
+
     /**
      * Toggle the soft input display or not.
      */
@@ -124,6 +151,8 @@ public final class KeyboardUtils {
         if (imm == null) return;
         imm.toggleSoftInput(0, 0);
     }
+
+    private static int sDecorViewDelta = 0;
 
     /**
      * Return whether soft input is visible.
@@ -142,7 +171,7 @@ public final class KeyboardUtils {
         Log.d("KeyboardUtils", "getDecorViewInvisibleHeight: "
                 + (decorView.getBottom() - outRect.bottom));
         int delta = Math.abs(decorView.getBottom() - outRect.bottom);
-        if (delta <= getNavBarHeight() + getStatusBarHeight()) {
+        if (delta <= UtilsBridge.getNavBarHeight() + UtilsBridge.getStatusBarHeight()) {
             sDecorViewDelta = delta;
             return 0;
         }
@@ -220,8 +249,8 @@ public final class KeyboardUtils {
      * @param window The window.
      */
     public static void fixAndroidBug5497(@NonNull final Window window) {
-//        int softInputMode = window.getAttributes().softInputMode;
-//        window.setSoftInputMode(softInputMode & ~WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+        int softInputMode = window.getAttributes().softInputMode;
+        window.setSoftInputMode(softInputMode & ~WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
         final FrameLayout contentView = window.findViewById(android.R.id.content);
         final View contentViewChild = contentView.getChildAt(0);
         final int paddingBottom = contentViewChild.getPaddingBottom();
@@ -252,7 +281,7 @@ public final class KeyboardUtils {
         Log.d("KeyboardUtils", "getContentViewInvisibleHeight: "
                 + (contentView.getBottom() - outRect.bottom));
         int delta = Math.abs(contentView.getBottom() - outRect.bottom);
-        if (delta <= getStatusBarHeight() + getNavBarHeight()) {
+        if (delta <= UtilsBridge.getStatusBarHeight() + UtilsBridge.getNavBarHeight()) {
             return 0;
         }
         return delta;
@@ -273,7 +302,24 @@ public final class KeyboardUtils {
      * @param window The window.
      */
     public static void fixSoftInputLeaks(@NonNull final Window window) {
-        Utils.fixSoftInputLeaks(window);
+        InputMethodManager imm =
+                (InputMethodManager) Utils.getApp().getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (imm == null) return;
+        String[] leakViews = new String[]{"mLastSrvView", "mCurRootView", "mServedView", "mNextServedView"};
+        for (String leakView : leakViews) {
+            try {
+                Field leakViewField = InputMethodManager.class.getDeclaredField(leakView);
+                if (!leakViewField.isAccessible()) {
+                    leakViewField.setAccessible(true);
+                }
+                Object obj = leakViewField.get(imm);
+                if (!(obj instanceof View)) continue;
+                View view = (View) obj;
+                if (view.getRootView() == window.getDecorView().getRootView()) {
+                    leakViewField.set(imm, null);
+                }
+            } catch (Throwable ignore) {/**/}
+        }
     }
 
     /**
@@ -310,41 +356,9 @@ public final class KeyboardUtils {
         */
     }
 
-    private static int getStatusBarHeight() {
-        Resources resources = Utils.getApp().getResources();
-        int resourceId = resources.getIdentifier("status_bar_height", "dimen", "android");
-        return resources.getDimensionPixelSize(resourceId);
-    }
-
-    private static int getNavBarHeight() {
-        Resources res = Utils.getApp().getResources();
-        int resourceId = res.getIdentifier("navigation_bar_height", "dimen", "android");
-        if (resourceId != 0) {
-            return res.getDimensionPixelSize(resourceId);
-        } else {
-            return 0;
-        }
-    }
-
-    private static Activity getActivityByView(@NonNull View view) {
-        return getActivityByContext(view.getContext());
-    }
-
-    private static Activity getActivityByContext(Context context) {
-        if (context instanceof Activity) return (Activity) context;
-        while (context instanceof ContextWrapper) {
-            if (context instanceof Activity) {
-                return (Activity) context;
-            }
-            context = ((ContextWrapper) context).getBaseContext();
-        }
-        return null;
-    }
-
-///////////////////////////////////////////////////////////////////////////
-// interface
-///////////////////////////////////////////////////////////////////////////
-
+    ///////////////////////////////////////////////////////////////////////////
+    // interface
+    ///////////////////////////////////////////////////////////////////////////
     public interface OnSoftInputChangedListener {
         void onSoftInputChanged(int height);
     }

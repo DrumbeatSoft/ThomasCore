@@ -21,17 +21,6 @@ import java.util.Locale;
  */
 public final class TimeUtils {
     private static final ThreadLocal<SimpleDateFormat> SDF_THREAD_LOCAL = new ThreadLocal<>();
-    private static final String[] CHINESE_ZODIAC =
-            {"猴", "鸡", "狗", "猪", "鼠", "牛", "虎", "兔", "龙", "蛇", "马", "羊"};
-    private static final int[] ZODIAC_FLAGS = {20, 19, 21, 21, 21, 22, 23, 23, 23, 24, 23, 22};
-    private static final String[] ZODIAC = {
-            "水瓶座", "双鱼座", "白羊座", "金牛座", "双子座", "巨蟹座",
-            "狮子座", "处女座", "天秤座", "天蝎座", "射手座", "魔羯座"
-    };
-
-    private TimeUtils() {
-        throw new UnsupportedOperationException("u can't instantiate me...");
-    }
 
     private static SimpleDateFormat getDefaultFormat() {
         return getDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -46,6 +35,10 @@ public final class TimeUtils {
             simpleDateFormat.applyPattern(pattern);
         }
         return simpleDateFormat;
+    }
+
+    private TimeUtils() {
+        throw new UnsupportedOperationException("u can't instantiate me...");
     }
 
     /**
@@ -660,10 +653,9 @@ public final class TimeUtils {
     public static String getFriendlyTimeSpanByNow(final long millis) {
         long now = System.currentTimeMillis();
         long span = now - millis;
-        if (span < 0) {
+        if (span < 0)
             // U can read http://www.apihome.cn/api/java/Formatter.html to understand it.
             return String.format("%tc", millis);
-        }
         if (span < 1000) {
             return "刚刚";
         } else if (span < TimeConstants.MIN) {
@@ -1461,6 +1453,9 @@ public final class TimeUtils {
         return cal.get(field);
     }
 
+    private static final String[] CHINESE_ZODIAC =
+            {"猴", "鸡", "狗", "猪", "鼠", "牛", "虎", "兔", "龙", "蛇", "马", "羊"};
+
     /**
      * Return the Chinese zodiac.
      * <p>The pattern is {@code yyyy-MM-dd HH:mm:ss}.</p>
@@ -1514,6 +1509,12 @@ public final class TimeUtils {
     public static String getChineseZodiac(final int year) {
         return CHINESE_ZODIAC[year % 12];
     }
+
+    private static final int[] ZODIAC_FLAGS = {20, 19, 21, 21, 21, 22, 23, 23, 23, 24, 23, 22};
+    private static final String[] ZODIAC = {
+            "水瓶座", "双鱼座", "白羊座", "金牛座", "双子座", "巨蟹座",
+            "狮子座", "处女座", "天秤座", "天蝎座", "射手座", "魔羯座"
+    };
 
     /**
      * Return the zodiac.
@@ -1582,15 +1583,11 @@ public final class TimeUtils {
         return millis / unit;
     }
 
-    private static String millis2FitTimeSpan(long millis, int precision) {
-        if (precision <= 0) {
-            return null;
-        }
+    static String millis2FitTimeSpan(long millis, int precision) {
+        if (precision <= 0) return null;
         precision = Math.min(precision, 5);
         String[] units = {"天", "小时", "分钟", "秒", "毫秒"};
-        if (millis == 0) {
-            return 0 + units[precision - 1];
-        }
+        if (millis == 0) return 0 + units[precision - 1];
         StringBuilder sb = new StringBuilder();
         if (millis < 0) {
             sb.append("-");

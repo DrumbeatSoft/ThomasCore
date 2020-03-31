@@ -35,9 +35,6 @@ import static android.content.Context.WIFI_SERVICE;
  * @since 1.0.0
  */
 public final class DeviceUtils {
-    private static final String KEY_UDID = "KEY_UDID";
-    private volatile static String udid;
-
     private DeviceUtils() {
         throw new UnsupportedOperationException("u can't instantiate me...");
     }
@@ -266,11 +263,11 @@ public final class DeviceUtils {
     }
 
     private static String getMacAddressByFile() {
-        ShellUtils.CommandResult result = ShellUtils.execCmd("getprop wifi.interface", false);
+        UtilsBridge.ShellCommandResult result = UtilsBridge.execCmd("getprop wifi.interface", false);
         if (result.result == 0) {
             String name = result.successMsg;
             if (name != null) {
-                result = ShellUtils.execCmd("cat /sys/class/net/" + name + "/address", false);
+                result = UtilsBridge.execCmd("cat /sys/class/net/" + name + "/address", false);
                 if (result.result == 0) {
                     String address = result.successMsg;
                     if (address != null && address.length() > 0) {
@@ -369,13 +366,15 @@ public final class DeviceUtils {
         intent.setData(Uri.parse(url));
         intent.setAction(Intent.ACTION_DIAL);
         boolean checkDial = intent.resolveActivity(Utils.getApp().getPackageManager()) == null;
-        if (checkDial) return true;
+        return checkDial;
 
 //        boolean checkDebuggerConnected = Debug.isDebuggerConnected();
 //        if (checkDebuggerConnected) return true;
-
-        return false;
     }
+
+
+    private static final String KEY_UDID = "KEY_UDID";
+    private volatile static String udid;
 
     /**
      * Return the unique device id.
@@ -387,7 +386,7 @@ public final class DeviceUtils {
      */
     @SuppressLint({"MissingPermission", "HardwareIds"})
     public static String getUniqueDeviceId() {
-        return getUniqueDeviceId("");
+        return getUniqueDeviceId("", true);
     }
 
     /**
@@ -401,26 +400,62 @@ public final class DeviceUtils {
      */
     @SuppressLint({"MissingPermission", "HardwareIds"})
     public static String getUniqueDeviceId(String prefix) {
+        return getUniqueDeviceId(prefix, true);
+    }
+
+    /**
+     * Return the unique device id.
+     * <pre>{1}{UUID(macAddress)}</pre>
+     * <pre>{2}{UUID(androidId )}</pre>
+     * <pre>{9}{UUID(random    )}</pre>
+     *
+     * @param useCache True to use cache, false otherwise.
+     * @return the unique device id
+     */
+    @SuppressLint({"MissingPermission", "HardwareIds"})
+    public static String getUniqueDeviceId(boolean useCache) {
+        return getUniqueDeviceId("", useCache);
+    }
+
+    /**
+     * Return the unique device id.
+     * <pre>android 10 deprecated {prefix}{1}{UUID(macAddress)}</pre>
+     * <pre>{prefix}{2}{UUID(androidId )}</pre>
+     * <pre>{prefix}{9}{UUID(random    )}</pre>
+     *
+     * @param prefix   The prefix of the unique device id.
+     * @param useCache True to use cache, false otherwise.
+     * @return the unique device id
+     */
+    @SuppressLint({"MissingPermission", "HardwareIds"})
+    public static String getUniqueDeviceId(String prefix, boolean useCache) {
+        if (!useCache) {
+            return getUniqueDeviceIdReal(prefix);
+        }
         if (udid == null) {
             synchronized (DeviceUtils.class) {
                 if (udid == null) {
-                    final String id = Utils.getThomasCore().getString(KEY_UDID, null);
+                    final String id = UtilsBridge.getSpUtils4Utils().getString(KEY_UDID, null);
                     if (id != null) {
                         udid = id;
                         return udid;
                     }
-                    try {
-                        final String androidId = getAndroidID();
-                        if (!TextUtils.isEmpty(androidId)) {
-                            return saveUdid(prefix + 2, androidId);
-                        }
-
-                    } catch (Exception ignore) {/**/}
-                    return saveUdid(prefix + 9, "");
+                    return getUniqueDeviceIdReal(prefix);
                 }
             }
         }
         return udid;
+    }
+
+    private static String getUniqueDeviceIdReal(String prefix) {
+        try {
+            final String androidId = getAndroidID();
+            if (!TextUtils.isEmpty(androidId)) {
+                return saveUdid(prefix + 2, androidId);
+            }
+
+        } catch (Exception ignore) {/**/}
+        return saveUdid(prefix + 9, "");
     }
 
     @SuppressLint({"MissingPermission", "HardwareIds"})
@@ -428,11 +463,17 @@ public final class DeviceUtils {
         // {prefix}{type}{32id}
         if (TextUtils.isEmpty(uniqueDeviceId) && uniqueDeviceId.length() < 33) return false;
         if (uniqueDeviceId.equals(udid)) return true;
-        final String cachedId = Utils.getThomasCore().getString(KEY_UDID, null);
+        final String cachedId = UtilsBridge.getSpUtils4Utils().getString(KEY_UDID, null);
         if (uniqueDeviceId.equals(cachedId)) return true;
         int st = uniqueDeviceId.length() - 33;
         String type = uniqueDeviceId.substring(st, st + 1);
-        if (type.startsWith("2")) {
+        if (type.startsWith("1")) {
+            String macAddress = getMacAddress();
+            if (macAddress.equals("")) {
+                return false;
+            }
+            return uniqueDeviceId.substring(st + 1).equals(getUdid("", macAddress));
+        } else if (type.startsWith("2")) {
             final String androidId = getAndroidID();
             if (TextUtils.isEmpty(androidId)) {
                 return false;
@@ -444,7 +485,7 @@ public final class DeviceUtils {
 
     private static String saveUdid(String prefix, String id) {
         udid = getUdid(prefix, id);
-        SPUtils.getInstance().put(KEY_UDID, udid);
+        UtilsBridge.getSpUtils4Utils().put(KEY_UDID, udid);
         return udid;
     }
 

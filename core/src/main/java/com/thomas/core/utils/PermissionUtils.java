@@ -34,11 +34,9 @@ import java.util.Set;
  * @since
  */
 public final class PermissionUtils {
-    private static final List<String> PERMISSIONS = getPermissions();
-
     private static PermissionUtils sInstance;
-    private static SimpleCallback sSimpleCallback4WriteSettings;
-    private static SimpleCallback sSimpleCallback4DrawOverlays;
+
+    private String[] mPermissionsParam;
     private OnRationaleListener mOnRationaleListener;
     private SimpleCallback mSimpleCallback;
     private FullCallback mFullCallback;
@@ -49,17 +47,8 @@ public final class PermissionUtils {
     private List<String> mPermissionsDenied;
     private List<String> mPermissionsDeniedForever;
 
-    private PermissionUtils(final String... permissions) {
-        mPermissions = new LinkedHashSet<>();
-        for (String permission : permissions) {
-            for (String aPermission : PermissionConstants.getPermissions(permission)) {
-                if (PERMISSIONS.contains(aPermission)) {
-                    mPermissions.add(aPermission);
-                }
-            }
-        }
-        sInstance = this;
-    }
+    private static SimpleCallback sSimpleCallback4WriteSettings;
+    private static SimpleCallback sSimpleCallback4DrawOverlays;
 
     /**
      * Return the permissions used in application.
@@ -133,7 +122,7 @@ public final class PermissionUtils {
     private static void startWriteSettingsActivity(final Activity activity, final int requestCode) {
         Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
         intent.setData(Uri.parse("package:" + Utils.getApp().getPackageName()));
-        if (!isIntentAvailable(intent)) {
+        if (!UtilsBridge.isIntentAvailable(intent)) {
             launchAppDetailsSettings();
             return;
         }
@@ -164,7 +153,7 @@ public final class PermissionUtils {
     private static void startOverlayPermissionActivity(final Activity activity, final int requestCode) {
         Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
         intent.setData(Uri.parse("package:" + Utils.getApp().getPackageName()));
-        if (!isIntentAvailable(intent)) {
+        if (!UtilsBridge.isIntentAvailable(intent)) {
             launchAppDetailsSettings();
             return;
         }
@@ -177,7 +166,7 @@ public final class PermissionUtils {
     public static void launchAppDetailsSettings() {
         Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
         intent.setData(Uri.parse("package:" + Utils.getApp().getPackageName()));
-        if (!isIntentAvailable(intent)) return;
+        if (!UtilsBridge.isIntentAvailable(intent)) return;
         Utils.getApp().startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
     }
 
@@ -191,11 +180,9 @@ public final class PermissionUtils {
         return new PermissionUtils(permissions);
     }
 
-    private static boolean isIntentAvailable(final Intent intent) {
-        return Utils.getApp()
-                .getPackageManager()
-                .queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY)
-                .size() > 0;
+    private PermissionUtils(final String... permissions) {
+        mPermissionsParam = permissions;
+        sInstance = this;
     }
 
     /**
@@ -246,10 +233,32 @@ public final class PermissionUtils {
      * Start request.
      */
     public void request() {
-        mPermissionsGranted = new ArrayList<>();
+        if (mPermissionsParam == null || mPermissionsParam.length <= 0) {
+            Log.e("PermissionUtils", "No permissions to request.");
+            return;
+        }
+
+        mPermissions = new LinkedHashSet<>();
         mPermissionsRequest = new ArrayList<>();
+        mPermissionsGranted = new ArrayList<>();
         mPermissionsDenied = new ArrayList<>();
         mPermissionsDeniedForever = new ArrayList<>();
+
+        List<String> appPermissions = getPermissions();
+        for (String param : mPermissionsParam) {
+            boolean isIncludeInManifest = false;
+            String[] permissions = PermissionConstants.getPermissions(param);
+            for (String permission : permissions) {
+                if (appPermissions.contains(permission)) {
+                    mPermissions.add(permission);
+                    isIncludeInManifest = true;
+                }
+            }
+            if (!isIncludeInManifest) {
+                mPermissionsDenied.add(param);
+                Log.e("PermissionUtils", "U should add the permission of " + param + " in manifest.");
+            }
+        }
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             mPermissionsGranted.addAll(mPermissions);
             requestCallback();
@@ -275,22 +284,12 @@ public final class PermissionUtils {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
-    private boolean rationale(final Activity activity) {
+    private boolean shouldRationale(final UtilsTransActivity activity, final Runnable againRunnable) {
         boolean isRationale = false;
         if (mOnRationaleListener != null) {
             for (String permission : mPermissionsRequest) {
                 if (activity.shouldShowRequestPermissionRationale(permission)) {
-                    getPermissionsStatus(activity);
-                    mOnRationaleListener.rationale(again -> {
-                        activity.finish();
-                        if (again) {
-                            mPermissionsDenied = new ArrayList<>();
-                            mPermissionsDeniedForever = new ArrayList<>();
-                            startPermissionActivity();
-                        } else {
-                            requestCallback();
-                        }
-                    });
+                    rationalInner(activity, againRunnable);
                     isRationale = true;
                     break;
                 }
@@ -298,6 +297,23 @@ public final class PermissionUtils {
             mOnRationaleListener = null;
         }
         return isRationale;
+    }
+
+    private void rationalInner(final UtilsTransActivity activity, final Runnable againRunnable) {
+        getPermissionsStatus(activity);
+        mOnRationaleListener.rationale(activity, new OnRationaleListener.ShouldRequest() {
+            @Override
+            public void again(boolean again) {
+                if (again) {
+                    mPermissionsDenied = new ArrayList<>();
+                    mPermissionsDeniedForever = new ArrayList<>();
+                    againRunnable.run();
+                } else {
+                    activity.finish();
+                    requestCallback();
+                }
+            }
+        });
     }
 
     private void getPermissionsStatus(final Activity activity) {
@@ -315,13 +331,10 @@ public final class PermissionUtils {
 
     private void requestCallback() {
         if (mSimpleCallback != null) {
-            if (mPermissionsRequest.size() == 0
-                    || mPermissions.size() == mPermissionsGranted.size()) {
+            if (mPermissionsDenied.isEmpty()) {
                 mSimpleCallback.onGranted();
             } else {
-                if (!mPermissionsDenied.isEmpty()) {
-                    mSimpleCallback.onDenied();
-                }
+                mSimpleCallback.onDenied();
             }
             mSimpleCallback = null;
         }
@@ -344,18 +357,127 @@ public final class PermissionUtils {
         requestCallback();
     }
 
-    public interface OnRationaleListener {
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    static final class PermissionActivityImpl extends UtilsTransActivity.TransActivityDelegate {
 
-        void rationale(ShouldRequest shouldRequest);
+        private static final String TYPE = "TYPE";
+        private static final int TYPE_RUNTIME = 0x01;
+        private static final int TYPE_WRITE_SETTINGS = 0x02;
+        private static final int TYPE_DRAW_OVERLAYS = 0x03;
 
-        interface ShouldRequest {
-            void again(boolean again);
+        private static PermissionActivityImpl INSTANCE = new PermissionActivityImpl();
+
+        public static void start(final int type) {
+            UtilsTransActivity.start(new Utils.Consumer<Intent>() {
+                @Override
+                public void accept(Intent data) {
+                    data.putExtra(TYPE, type);
+                }
+            }, INSTANCE);
+        }
+
+        @Override
+        public void onCreated(final UtilsTransActivity activity, @Nullable Bundle savedInstanceState) {
+            activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
+                    | WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH);
+            int type = activity.getIntent().getIntExtra(TYPE, -1);
+            if (type == TYPE_RUNTIME) {
+                if (sInstance == null) {
+                    Log.e("PermissionUtils", "request permissions failed");
+                    activity.finish();
+                    return;
+                }
+                if (sInstance.mThemeCallback != null) {
+                    sInstance.mThemeCallback.onActivityCreate(activity);
+                }
+                if (sInstance.shouldRationale(activity, new Runnable() {
+                    @Override
+                    public void run() {
+                        requestPermissions(activity);
+                    }
+                })) {
+                    return;
+                }
+                requestPermissions(activity);
+            } else if (type == TYPE_WRITE_SETTINGS) {
+                startWriteSettingsActivity(activity, TYPE_WRITE_SETTINGS);
+            } else if (type == TYPE_DRAW_OVERLAYS) {
+                startOverlayPermissionActivity(activity, TYPE_DRAW_OVERLAYS);
+            } else {
+                activity.finish();
+                Log.e("PermissionUtils", "type is wrong.");
+            }
+        }
+
+        private void requestPermissions(Activity activity) {
+            if (sInstance.mPermissionsRequest != null) {
+                int size = sInstance.mPermissionsRequest.size();
+                if (size <= 0) {
+                    activity.finish();
+                    return;
+                }
+                activity.requestPermissions(sInstance.mPermissionsRequest.toArray(new String[size]), 1);
+            }
+        }
+
+        @Override
+        public void onRequestPermissionsResult(UtilsTransActivity activity,
+                                               int requestCode,
+                                               String[] permissions,
+                                               int[] grantResults) {
+            if (sInstance != null && sInstance.mPermissionsRequest != null) {
+                sInstance.onRequestPermissionsResult(activity);
+            }
+            activity.finish();
+        }
+
+
+        @Override
+        public boolean dispatchTouchEvent(UtilsTransActivity activity, MotionEvent ev) {
+            activity.finish();
+            return true;
+        }
+
+        @Override
+        public void onActivityResult(UtilsTransActivity activity, int requestCode, int resultCode, Intent data) {
+            if (requestCode == TYPE_WRITE_SETTINGS) {
+                if (sSimpleCallback4WriteSettings == null) return;
+                if (isGrantedWriteSettings()) {
+                    sSimpleCallback4WriteSettings.onGranted();
+                } else {
+                    sSimpleCallback4WriteSettings.onDenied();
+                }
+                sSimpleCallback4WriteSettings = null;
+            } else if (requestCode == TYPE_DRAW_OVERLAYS) {
+                if (sSimpleCallback4DrawOverlays == null) return;
+                UtilsBridge.runOnUiThreadDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (isGrantedDrawOverlays()) {
+                            sSimpleCallback4DrawOverlays.onGranted();
+                        } else {
+                            sSimpleCallback4DrawOverlays.onDenied();
+                        }
+                        sSimpleCallback4DrawOverlays = null;
+                    }
+                }, 100);
+            }
+            activity.finish();
         }
     }
 
     ///////////////////////////////////////////////////////////////////////////
     // interface
     ///////////////////////////////////////////////////////////////////////////
+
+    public interface OnRationaleListener {
+
+        void rationale(UtilsTransActivity activity, ShouldRequest shouldRequest);
+
+        interface ShouldRequest {
+            void again(boolean again);
+        }
+    }
 
     public interface SimpleCallback {
         void onGranted();
@@ -371,100 +493,5 @@ public final class PermissionUtils {
 
     public interface ThemeCallback {
         void onActivityCreate(Activity activity);
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.M)
-    static final class PermissionActivityImpl extends Utils.TransActivity.TransActivityDelegate {
-
-        private static final String TYPE = "TYPE";
-        private static final int TYPE_RUNTIME = 0x01;
-        private static final int TYPE_WRITE_SETTINGS = 0x02;
-        private static final int TYPE_DRAW_OVERLAYS = 0x03;
-
-        private static PermissionActivityImpl INSTANCE = new PermissionActivityImpl();
-
-        public static void start(final int type) {
-            Utils.TransActivity.start(data -> {
-                data.putExtra(TYPE, type);
-                return null;
-            }, INSTANCE);
-        }
-
-        @Override
-        public void onCreated(Activity activity, @Nullable Bundle savedInstanceState) {
-            activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
-                    | WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH);
-            int type = activity.getIntent().getIntExtra(TYPE, -1);
-            if (type == TYPE_RUNTIME) {
-                if (sInstance == null) {
-                    Log.e("PermissionUtils", "request permissions failed");
-                    activity.finish();
-                    return;
-                }
-                if (sInstance.mThemeCallback != null) {
-                    sInstance.mThemeCallback.onActivityCreate(activity);
-                }
-                if (sInstance.rationale(activity)) {
-                    return;
-                }
-                if (sInstance.mPermissionsRequest != null) {
-                    int size = sInstance.mPermissionsRequest.size();
-                    if (size <= 0) {
-                        activity.finish();
-                        return;
-                    }
-                    activity.requestPermissions(sInstance.mPermissionsRequest.toArray(new String[size]), 1);
-                }
-            } else if (type == TYPE_WRITE_SETTINGS) {
-                startWriteSettingsActivity(activity, TYPE_WRITE_SETTINGS);
-            } else if (type == TYPE_DRAW_OVERLAYS) {
-                startOverlayPermissionActivity(activity, TYPE_DRAW_OVERLAYS);
-            } else {
-                activity.finish();
-                Log.e("PermissionUtils", "type is wrong.");
-            }
-        }
-
-        @Override
-        public void onRequestPermissionsResult(Activity activity,
-                                               int requestCode,
-                                               String[] permissions,
-                                               int[] grantResults) {
-            if (sInstance != null && sInstance.mPermissionsRequest != null) {
-                sInstance.onRequestPermissionsResult(activity);
-            }
-            activity.finish();
-        }
-
-
-        @Override
-        public boolean dispatchTouchEvent(Activity activity, MotionEvent ev) {
-            activity.finish();
-            return true;
-        }
-
-        @Override
-        public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
-            if (requestCode == TYPE_WRITE_SETTINGS) {
-                if (sSimpleCallback4WriteSettings == null) return;
-                if (isGrantedWriteSettings()) {
-                    sSimpleCallback4WriteSettings.onGranted();
-                } else {
-                    sSimpleCallback4WriteSettings.onDenied();
-                }
-                sSimpleCallback4WriteSettings = null;
-            } else if (requestCode == TYPE_DRAW_OVERLAYS) {
-                if (sSimpleCallback4DrawOverlays == null) return;
-                Utils.runOnUiThreadDelayed(() -> {
-                    if (isGrantedDrawOverlays()) {
-                        sSimpleCallback4DrawOverlays.onGranted();
-                    } else {
-                        sSimpleCallback4DrawOverlays.onDenied();
-                    }
-                    sSimpleCallback4DrawOverlays = null;
-                }, 100);
-            }
-            activity.finish();
-        }
     }
 }

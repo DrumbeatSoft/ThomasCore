@@ -11,9 +11,10 @@ public interface IBaseMvpView {
 
     /**
      * 失败数据
-     * @param tag 标签
+     *
+     * @param tag    标签
      * @param failed 失败数据
      */
-    void onFailed(Object tag,String failed);
+    void onFailed(Object tag, String failed);
 
 }

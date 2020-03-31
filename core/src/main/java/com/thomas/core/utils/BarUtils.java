@@ -3,12 +3,10 @@ package com.thomas.core.utils;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
-import android.content.ContextWrapper;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.os.Build;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.KeyCharacterMap;
@@ -164,14 +162,10 @@ public final class BarUtils {
      * @param view The view.
      */
     public static void addMarginTopEqualStatusBarHeight(@NonNull View view) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
-            return;
-        }
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) return;
         view.setTag(TAG_OFFSET);
         Object haveSetOffset = view.getTag(KEY_OFFSET);
-        if (haveSetOffset != null && (Boolean) haveSetOffset) {
-            return;
-        }
+        if (haveSetOffset != null && (Boolean) haveSetOffset) return;
         MarginLayoutParams layoutParams = (MarginLayoutParams) view.getLayoutParams();
         layoutParams.setMargins(layoutParams.leftMargin,
                 layoutParams.topMargin + getStatusBarHeight(),
@@ -186,13 +180,9 @@ public final class BarUtils {
      * @param view The view.
      */
     public static void subtractMarginTopEqualStatusBarHeight(@NonNull View view) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
-            return;
-        }
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) return;
         Object haveSetOffset = view.getTag(KEY_OFFSET);
-        if (haveSetOffset == null || !(Boolean) haveSetOffset) {
-            return;
-        }
+        if (haveSetOffset == null || !(Boolean) haveSetOffset) return;
         MarginLayoutParams layoutParams = (MarginLayoutParams) view.getLayoutParams();
         layoutParams.setMargins(layoutParams.leftMargin,
                 layoutParams.topMargin - getStatusBarHeight(),
@@ -202,24 +192,16 @@ public final class BarUtils {
     }
 
     private static void addMarginTopEqualStatusBarHeight(final Window window) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
-            return;
-        }
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) return;
         View withTag = window.getDecorView().findViewWithTag(TAG_OFFSET);
-        if (withTag == null) {
-            return;
-        }
+        if (withTag == null) return;
         addMarginTopEqualStatusBarHeight(withTag);
     }
 
     private static void subtractMarginTopEqualStatusBarHeight(final Window window) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
-            return;
-        }
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) return;
         View withTag = window.getDecorView().findViewWithTag(TAG_OFFSET);
-        if (withTag == null) {
-            return;
-        }
+        if (withTag == null) return;
         subtractMarginTopEqualStatusBarHeight(withTag);
     }
 
@@ -245,9 +227,7 @@ public final class BarUtils {
     public static View setStatusBarColor(@NonNull final Activity activity,
                                          @ColorInt final int color,
                                          final boolean isDecor) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
-            return null;
-        }
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) return null;
         transparentStatusBar(activity);
         return applyStatusBarColor(activity, color, isDecor);
     }
@@ -288,13 +268,9 @@ public final class BarUtils {
      */
     public static void setStatusBarColor(@NonNull final View fakeStatusBar,
                                          @ColorInt final int color) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
-            return;
-        }
-        Activity activity = getActivityByView(fakeStatusBar);
-        if (activity == null) {
-            return;
-        }
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) return;
+        Activity activity = UtilsBridge.getActivityByContext(fakeStatusBar.getContext());
+        if (activity == null) return;
         transparentStatusBar(activity);
         fakeStatusBar.setVisibility(View.VISIBLE);
         ViewGroup.LayoutParams layoutParams = fakeStatusBar.getLayoutParams();
@@ -309,13 +285,9 @@ public final class BarUtils {
      * @param fakeStatusBar The fake status bar view.
      */
     public static void setStatusBarCustom(@NonNull final View fakeStatusBar) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
-            return;
-        }
-        Activity activity = getActivityByView(fakeStatusBar);
-        if (activity == null) {
-            return;
-        }
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) return;
+        Activity activity = UtilsBridge.getActivityByContext(fakeStatusBar.getContext());
+        if (activity == null) return;
         transparentStatusBar(activity);
         fakeStatusBar.setVisibility(View.VISIBLE);
         ViewGroup.LayoutParams layoutParams = fakeStatusBar.getLayoutParams();
@@ -358,13 +330,9 @@ public final class BarUtils {
                                                 @NonNull final View fakeStatusBar,
                                                 @ColorInt final int color,
                                                 final boolean isTop) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
-            return;
-        }
-        Activity activity = getActivityByView(fakeStatusBar);
-        if (activity == null) {
-            return;
-        }
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) return;
+        Activity activity = UtilsBridge.getActivityByContext(fakeStatusBar.getContext());
+        if (activity == null) return;
         transparentStatusBar(activity);
         drawer.setFitsSystemWindows(false);
         setStatusBarColor(fakeStatusBar, color);
@@ -410,18 +378,14 @@ public final class BarUtils {
     private static void hideStatusBarView(final Window window) {
         ViewGroup decorView = (ViewGroup) window.getDecorView();
         View fakeStatusBarView = decorView.findViewWithTag(TAG_STATUS_BAR);
-        if (fakeStatusBarView == null) {
-            return;
-        }
+        if (fakeStatusBarView == null) return;
         fakeStatusBarView.setVisibility(View.GONE);
     }
 
     private static void showStatusBarView(final Window window) {
         ViewGroup decorView = (ViewGroup) window.getDecorView();
         View fakeStatusBarView = decorView.findViewWithTag(TAG_STATUS_BAR);
-        if (fakeStatusBarView == null) {
-            return;
-        }
+        if (fakeStatusBarView == null) return;
         fakeStatusBarView.setVisibility(View.VISIBLE);
     }
 
@@ -532,9 +496,7 @@ public final class BarUtils {
      * @param isVisible True to set navigation bar visible, false otherwise.
      */
     public static void setNavBarVisibility(@NonNull final Activity activity, boolean isVisible) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
-            return;
-        }
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) return;
         setNavBarVisibility(activity.getWindow(), isVisible);
 
     }
@@ -546,9 +508,7 @@ public final class BarUtils {
      * @param isVisible True to set navigation bar visible, false otherwise.
      */
     public static void setNavBarVisibility(@NonNull final Window window, boolean isVisible) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
-            return;
-        }
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) return;
         final ViewGroup decorView = (ViewGroup) window.getDecorView();
         for (int i = 0, count = decorView.getChildCount(); i < count; i++) {
             final View child = decorView.getChildAt(i);
@@ -667,9 +627,7 @@ public final class BarUtils {
     public static boolean isSupportNavBar() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
             WindowManager wm = (WindowManager) Utils.getApp().getSystemService(Context.WINDOW_SERVICE);
-            if (wm == null) {
-                return false;
-            }
+            if (wm == null) return false;
             Display display = wm.getDefaultDisplay();
             Point size = new Point();
             Point realSize = new Point();
@@ -690,7 +648,7 @@ public final class BarUtils {
      */
     public static void setNavBarLightMode(@NonNull final Activity activity,
                                           final boolean isLightMode) {
-        setStatusBarLightMode(activity.getWindow(), isLightMode);
+        setNavBarLightMode(activity.getWindow(), isLightMode);
     }
 
     /**
@@ -720,7 +678,7 @@ public final class BarUtils {
      * @return {@code true}: yes<br>{@code false}: no
      */
     public static boolean isNavBarLightMode(@NonNull final Activity activity) {
-        return isStatusBarLightMode(activity.getWindow());
+        return isNavBarLightMode(activity.getWindow());
     }
 
     /**
@@ -736,17 +694,5 @@ public final class BarUtils {
             return (vis & View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR) != 0;
         }
         return false;
-    }
-
-    private static Activity getActivityByView(@NonNull final View view) {
-        Context context = view.getContext();
-        while (context instanceof ContextWrapper) {
-            if (context instanceof Activity) {
-                return (Activity) context;
-            }
-            context = ((ContextWrapper) context).getBaseContext();
-        }
-        Log.e("BarUtils", "the view's Context is not an Activity.");
-        return null;
     }
 }

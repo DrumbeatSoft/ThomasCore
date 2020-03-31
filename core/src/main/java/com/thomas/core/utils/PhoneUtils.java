@@ -2,9 +2,6 @@ package com.thomas.core.utils;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.os.Build;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
@@ -25,6 +22,7 @@ import static android.Manifest.permission.READ_PHONE_STATE;
  * @since
  */
 public final class PhoneUtils {
+
 
     private PhoneUtils() {
         throw new UnsupportedOperationException("u can't instantiate me...");
@@ -55,14 +53,10 @@ public final class PhoneUtils {
         }
         TelephonyManager tm = getTelephonyManager();
         String deviceId = tm.getDeviceId();
-        if (!TextUtils.isEmpty(deviceId)) {
-            return deviceId;
-        }
+        if (!TextUtils.isEmpty(deviceId)) return deviceId;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             String imei = tm.getImei();
-            if (!TextUtils.isEmpty(imei)) {
-                return imei;
-            }
+            if (!TextUtils.isEmpty(imei)) return imei;
             String meid = tm.getMeid();
             return TextUtils.isEmpty(meid) ? "" : meid;
         }
@@ -176,9 +170,7 @@ public final class PhoneUtils {
     private static String getMinOne(String s0, String s1) {
         boolean empty0 = TextUtils.isEmpty(s0);
         boolean empty1 = TextUtils.isEmpty(s1);
-        if (empty0 && empty1) {
-            return "";
-        }
+        if (empty0 && empty1) return "";
         if (!empty0 && !empty1) {
             if (s0.compareTo(s1) <= 0) {
                 return s0;
@@ -186,9 +178,7 @@ public final class PhoneUtils {
                 return s1;
             }
         }
-        if (!empty0) {
-            return s0;
-        }
+        if (!empty0) return s0;
         return s1;
     }
 
@@ -258,9 +248,7 @@ public final class PhoneUtils {
     public static String getSimOperatorByMnc() {
         TelephonyManager tm = getTelephonyManager();
         String operator = tm.getSimOperator();
-        if (operator == null) {
-            return "";
-        }
+        if (operator == null) return "";
         switch (operator) {
             case "46000":
             case "46002":
@@ -284,15 +272,9 @@ public final class PhoneUtils {
      * Skip to dial.
      *
      * @param phoneNumber The phone number.
-     * @return {@code true}: operate successfully<br>{@code false}: otherwise
      */
-    public static boolean dial(final String phoneNumber) {
-        Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + phoneNumber));
-        if (isIntentAvailable(intent)) {
-            Utils.getApp().startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
-            return true;
-        }
-        return false;
+    public static void dial(final String phoneNumber) {
+        Utils.getApp().startActivity(UtilsBridge.getDialIntent(phoneNumber));
     }
 
     /**
@@ -300,16 +282,10 @@ public final class PhoneUtils {
      * <p>Must hold {@code <uses-permission android:name="android.permission.CALL_PHONE" />}</p>
      *
      * @param phoneNumber The phone number.
-     * @return {@code true}: operate successfully<br>{@code false}: otherwise
      */
     @RequiresPermission(CALL_PHONE)
-    public static boolean call(final String phoneNumber) {
-        Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + phoneNumber));
-        if (isIntentAvailable(intent)) {
-            Utils.getApp().startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
-            return true;
-        }
-        return false;
+    public static void call(final String phoneNumber) {
+        Utils.getApp().startActivity(UtilsBridge.getCallIntent(phoneNumber));
     }
 
     /**
@@ -317,27 +293,12 @@ public final class PhoneUtils {
      *
      * @param phoneNumber The phone number.
      * @param content     The content.
-     * @return {@code true}: operate successfully<br>{@code false}: otherwise
      */
-    public static boolean sendSms(final String phoneNumber, final String content) {
-        Uri uri = Uri.parse("smsto:" + phoneNumber);
-        Intent intent = new Intent(Intent.ACTION_SENDTO, uri);
-        if (isIntentAvailable(intent)) {
-            intent.putExtra("sms_body", content);
-            Utils.getApp().startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
-            return true;
-        }
-        return false;
+    public static void sendSms(final String phoneNumber, final String content) {
+        Utils.getApp().startActivity(UtilsBridge.getSendSmsIntent(phoneNumber, content));
     }
 
     private static TelephonyManager getTelephonyManager() {
         return (TelephonyManager) Utils.getApp().getSystemService(Context.TELEPHONY_SERVICE);
-    }
-
-    private static boolean isIntentAvailable(final Intent intent) {
-        return Utils.getApp()
-                .getPackageManager()
-                .queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY)
-                .size() > 0;
     }
 }

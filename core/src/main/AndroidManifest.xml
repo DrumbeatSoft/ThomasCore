@@ -6,14 +6,14 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="m">
         <activity
-            android:name=".utils.Utils$TransActivity"
+            android:name=".utils.UtilsTransActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:multiprocess="true"
             android:theme="@style/ActivityTranslucent"
             android:windowSoftInputMode="stateHidden|stateAlwaysHidden" />
 
         <provider
-            android:name=".utils.Utils$FileProvider4ThomasCore"
+            android:name=".utils.UtilsFileProvider"
             android:authorities="${applicationId}.thomas.provider"
             android:exported="false"
             android:grantUriPermissions="true"
@@ -22,8 +22,6 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/thomas_core_provider_paths" />
         </provider>
-
-
 
 
     </application>

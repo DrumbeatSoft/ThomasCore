@@ -29,7 +29,6 @@ import java.util.List;
  * @since 1.0.0
  */
 public final class FragmentUtils {
-
     private static final int TYPE_ADD_FRAGMENT = 0x01;
     private static final int TYPE_SHOW_FRAGMENT = 0x01 << 1;
     private static final int TYPE_HIDE_FRAGMENT = 0x01 << 2;
@@ -1549,7 +1548,7 @@ public final class FragmentUtils {
                 }
             }
         }
-        return null;
+        return parentFragment;
     }
 
     /**
@@ -1793,10 +1792,6 @@ public final class FragmentUtils {
         return fragment == null ? "null" : fragment.getClass().getSimpleName();
     }
 
-    public interface OnBackClickListener {
-        boolean onBackClick();
-    }
-
     private static class Args {
         final int id;
         final boolean isHide;
@@ -1815,10 +1810,6 @@ public final class FragmentUtils {
             this.isAddStack = isAddStack;
         }
     }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // interface
-    ///////////////////////////////////////////////////////////////////////////
 
     public static class FragmentNode {
         final Fragment fragment;
@@ -1843,5 +1834,13 @@ public final class FragmentUtils {
                     + "->"
                     + ((next == null || next.isEmpty()) ? "no child" : next.toString());
         }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // interface
+    ///////////////////////////////////////////////////////////////////////////
+
+    public interface OnBackClickListener {
+        boolean onBackClick();
     }
 }

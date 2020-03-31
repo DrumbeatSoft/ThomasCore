@@ -41,6 +41,7 @@ import android.text.style.URLSpan;
 import android.text.style.UnderlineSpan;
 import android.text.style.UpdateAppearance;
 import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
 
 import androidx.annotation.ColorInt;
@@ -68,16 +69,24 @@ import static android.graphics.BlurMaskFilter.Blur;
  * @since 1.0.0
  */
 public final class SpanUtils {
+    private static final int COLOR_DEFAULT = 0xFEFFFFFF;
 
     public static final int ALIGN_BOTTOM = 0;
     public static final int ALIGN_BASELINE = 1;
     public static final int ALIGN_CENTER = 2;
     public static final int ALIGN_TOP = 3;
-    private static final int COLOR_DEFAULT = 0xFEFFFFFF;
+
+    @IntDef({ALIGN_BOTTOM, ALIGN_BASELINE, ALIGN_CENTER, ALIGN_TOP})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface Align {
+    }
+
     private static final String LINE_SEPARATOR = System.getProperty("line.separator");
-    private final int mTypeCharSequence = 0;
-    private final int mTypeImage = 1;
-    private final int mTypeSpace = 2;
+
+    public static SpanUtils with(final TextView textView) {
+        return new SpanUtils(textView);
+    }
+
     private TextView mTextView;
     private CharSequence mText;
     private int flag;
@@ -118,15 +127,24 @@ public final class SpanUtils {
     private float shadowDy;
     private int shadowColor;
     private Object[] spans;
+
     private Bitmap imageBitmap;
     private Drawable imageDrawable;
     private Uri imageUri;
     private int imageResourceId;
     private int alignImage;
+
     private int spaceSize;
     private int spaceColor;
+
     private SerializableSpannableStringBuilder mBuilder;
+    private boolean isCreated;
+
     private int mType;
+    private final int mTypeCharSequence = 0;
+    private final int mTypeImage = 1;
+    private final int mTypeSpace = 2;
+
     private SpanUtils(TextView textView) {
         this();
         mTextView = textView;
@@ -137,10 +155,6 @@ public final class SpanUtils {
         mText = "";
         mType = -1;
         setDefault();
-    }
-
-    public static SpanUtils with(final TextView textView) {
-        return new SpanUtils(textView);
     }
 
     private void setDefault() {
@@ -507,6 +521,39 @@ public final class SpanUtils {
     }
 
     /**
+     * Set the span of click.
+     * <p>Must set {@code view.setMovementMethod(LinkMovementMethod.getInstance())}</p>
+     *
+     * @param color         The color of click span.
+     * @param underlineText True to support underline, false otherwise.
+     * @param listener      The listener of click span.
+     * @return the single {@link SpanUtils} instance
+     */
+    public SpanUtils setClickSpan(@ColorInt final int color,
+                                  final boolean underlineText,
+                                  final View.OnClickListener listener) {
+        if (mTextView != null && mTextView.getMovementMethod() == null) {
+            mTextView.setMovementMethod(LinkMovementMethod.getInstance());
+        }
+        this.clickSpan = new ClickableSpan() {
+
+            @Override
+            public void updateDrawState(@NonNull TextPaint paint) {
+                paint.setColor(color);
+                paint.setUnderlineText(underlineText);
+            }
+
+            @Override
+            public void onClick(@NonNull View widget) {
+                if (listener != null) {
+                    listener.onClick(widget);
+                }
+            }
+        };
+        return this;
+    }
+
+    /**
      * Set the span of url.
      * <p>Must set {@code view.setMovementMethod(LinkMovementMethod.getInstance())}</p>
      *
@@ -783,10 +830,14 @@ public final class SpanUtils {
         if (mTextView != null) {
             mTextView.setText(mBuilder);
         }
+        isCreated = true;
         return mBuilder;
     }
 
     private void applyLast() {
+        if (isCreated) {
+            return;
+        }
         if (mType == mTypeCharSequence) {
             updateCharCharSequence();
         } else if (mType == mTypeImage) {
@@ -798,9 +849,7 @@ public final class SpanUtils {
     }
 
     private void updateCharCharSequence() {
-        if (mText.length() == 0) {
-            return;
-        }
+        if (mText.length() == 0) return;
         int start = mBuilder.length();
         if (start == 0 && lineHeight != -1) {// bug of LineHeightSpan when first line
             mBuilder.append(Character.toString((char) 2))
@@ -936,11 +985,6 @@ public final class SpanUtils {
         mBuilder.setSpan(new SpaceSpan(spaceSize, spaceColor), start, end, flag);
     }
 
-    @IntDef({ALIGN_BOTTOM, ALIGN_BASELINE, ALIGN_CENTER, ALIGN_TOP})
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface Align {
-    }
-
     static class VerticalAlignSpan extends ReplacementSpan {
 
         static final int ALIGN_CENTER = 2;
@@ -991,11 +1035,13 @@ public final class SpanUtils {
 
     static class CustomLineHeightSpan implements LineHeightSpan {
 
+        private final int height;
+
         static final int ALIGN_CENTER = 2;
         static final int ALIGN_TOP = 3;
-        static Paint.FontMetricsInt sfm;
+
         final int mVerticalAlignment;
-        private final int height;
+        static Paint.FontMetricsInt sfm;
 
         CustomLineHeightSpan(int height, int verticalAlignment) {
             this.height = height;
@@ -1005,7 +1051,7 @@ public final class SpanUtils {
         @Override
         public void chooseHeight(final CharSequence text, final int start, final int end,
                                  final int spanstartv, final int v, final Paint.FontMetricsInt fm) {
-            LogUtils.e(fm, sfm);
+//            LogUtils.e(fm, sfm);
             if (sfm == null) {
                 sfm = new Paint.FontMetricsInt();
                 sfm.top = fm.top;
@@ -1045,7 +1091,7 @@ public final class SpanUtils {
             if (end == ((Spanned) text).getSpanEnd(this)) {
                 sfm = null;
             }
-            LogUtils.e(fm, sfm);
+//            LogUtils.e(fm, sfm);
         }
     }
 
@@ -1096,12 +1142,10 @@ public final class SpanUtils {
             this.gapWidth = gapWidth;
         }
 
-        @Override
         public int getLeadingMargin(final boolean first) {
             return stripeWidth + gapWidth;
         }
 
-        @Override
         public void drawLeadingMargin(final Canvas c, final Paint p, final int x, final int dir,
                                       final int top, final int baseline, final int bottom,
                                       final CharSequence text, final int start, final int end,
@@ -1133,12 +1177,10 @@ public final class SpanUtils {
             this.gapWidth = gapWidth;
         }
 
-        @Override
         public int getLeadingMargin(final boolean first) {
             return 2 * radius + gapWidth;
         }
 
-        @Override
         public void drawLeadingMargin(final Canvas c, final Paint p, final int x, final int dir,
                                       final int top, final int baseline, final int bottom,
                                       final CharSequence text, final int start, final int end,
@@ -1289,7 +1331,6 @@ public final class SpanUtils {
         static final int ALIGN_TOP = 3;
 
         final int mVerticalAlignment;
-        private WeakReference<Drawable> mDrawableRef;
 
         private CustomDynamicDrawableSpan() {
             mVerticalAlignment = ALIGN_BOTTOM;
@@ -1372,6 +1413,8 @@ public final class SpanUtils {
             }
             return d;
         }
+
+        private WeakReference<Drawable> mDrawableRef;
     }
 
     static class ShaderSpan extends CharacterStyle implements UpdateAppearance {
@@ -1407,10 +1450,6 @@ public final class SpanUtils {
             tp.setShadowLayer(radius, dx, dy, shadowColor);
         }
     }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // static
-    ///////////////////////////////////////////////////////////////////////////
 
     private static class SerializableSpannableStringBuilder extends SpannableStringBuilder
             implements Serializable {

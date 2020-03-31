@@ -6,6 +6,7 @@ import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 /**
@@ -16,6 +17,7 @@ import java.util.List;
  * @since 1.0.0
  */
 public final class ShellUtils {
+
     private static final String LINE_SEP = System.getProperty("line.separator");
 
     private ShellUtils() {
@@ -27,13 +29,13 @@ public final class ShellUtils {
      *
      * @param command  The command.
      * @param isRooted True to use root, false otherwise.
-     * @param callback The callback.
+     * @param consumer The consumer.
      * @return the task
      */
     public static Utils.Task<CommandResult> execCmdAsync(final String command,
                                                          final boolean isRooted,
-                                                         final Utils.Callback<CommandResult> callback) {
-        return execCmdAsync(new String[]{command}, isRooted, true, callback);
+                                                         final Utils.Consumer<CommandResult> consumer) {
+        return execCmdAsync(new String[]{command}, isRooted, true, consumer);
     }
 
     /**
@@ -41,13 +43,13 @@ public final class ShellUtils {
      *
      * @param commands The commands.
      * @param isRooted True to use root, false otherwise.
-     * @param callback The callback.
+     * @param consumer The consumer.
      * @return the task
      */
     public static Utils.Task<CommandResult> execCmdAsync(final List<String> commands,
                                                          final boolean isRooted,
-                                                         final Utils.Callback<CommandResult> callback) {
-        return execCmdAsync(commands == null ? null : commands.toArray(new String[]{}), isRooted, true, callback);
+                                                         final Utils.Consumer<CommandResult> consumer) {
+        return execCmdAsync(commands == null ? null : commands.toArray(new String[]{}), isRooted, true, consumer);
     }
 
     /**
@@ -55,13 +57,13 @@ public final class ShellUtils {
      *
      * @param commands The commands.
      * @param isRooted True to use root, false otherwise.
-     * @param callback The callback.
+     * @param consumer The consumer.
      * @return the task
      */
     public static Utils.Task<CommandResult> execCmdAsync(final String[] commands,
                                                          final boolean isRooted,
-                                                         final Utils.Callback<CommandResult> callback) {
-        return execCmdAsync(commands, isRooted, true, callback);
+                                                         final Utils.Consumer<CommandResult> consumer) {
+        return execCmdAsync(commands, isRooted, true, consumer);
     }
 
     /**
@@ -70,14 +72,14 @@ public final class ShellUtils {
      * @param command         The command.
      * @param isRooted        True to use root, false otherwise.
      * @param isNeedResultMsg True to return the message of result, false otherwise.
-     * @param callback        The callback.
+     * @param consumer        The consumer.
      * @return the task
      */
     public static Utils.Task<CommandResult> execCmdAsync(final String command,
                                                          final boolean isRooted,
                                                          final boolean isNeedResultMsg,
-                                                         final Utils.Callback<CommandResult> callback) {
-        return execCmdAsync(new String[]{command}, isRooted, isNeedResultMsg, callback);
+                                                         final Utils.Consumer<CommandResult> consumer) {
+        return execCmdAsync(new String[]{command}, isRooted, isNeedResultMsg, consumer);
     }
 
     /**
@@ -86,17 +88,17 @@ public final class ShellUtils {
      * @param commands        The commands.
      * @param isRooted        True to use root, false otherwise.
      * @param isNeedResultMsg True to return the message of result, false otherwise.
-     * @param callback        The callback.
+     * @param consumer        The consumer.
      * @return the task
      */
     public static Utils.Task<CommandResult> execCmdAsync(final List<String> commands,
                                                          final boolean isRooted,
                                                          final boolean isNeedResultMsg,
-                                                         final Utils.Callback<CommandResult> callback) {
+                                                         final Utils.Consumer<CommandResult> consumer) {
         return execCmdAsync(commands == null ? null : commands.toArray(new String[]{}),
                 isRooted,
                 isNeedResultMsg,
-                callback);
+                consumer);
     }
 
     /**
@@ -105,14 +107,14 @@ public final class ShellUtils {
      * @param commands        The commands.
      * @param isRooted        True to use root, false otherwise.
      * @param isNeedResultMsg True to return the message of result, false otherwise.
-     * @param callback        The callback.
+     * @param consumer        The consumer.
      * @return the task
      */
     public static Utils.Task<CommandResult> execCmdAsync(final String[] commands,
                                                          final boolean isRooted,
                                                          final boolean isNeedResultMsg,
-                                                         @NonNull final Utils.Callback<CommandResult> callback) {
-        return Utils.doAsync(new Utils.Task<CommandResult>(callback) {
+                                                         @NonNull final Utils.Consumer<CommandResult> consumer) {
+        return UtilsBridge.doAsync(new Utils.Task<CommandResult>(consumer) {
             @Override
             public CommandResult doInBackground() {
                 return execCmd(commands, isRooted, isNeedResultMsg);
@@ -208,9 +210,7 @@ public final class ShellUtils {
             process = Runtime.getRuntime().exec(isRooted ? "su" : "sh");
             os = new DataOutputStream(process.getOutputStream());
             for (String command : commands) {
-                if (command == null) {
-                    continue;
-                }
+                if (command == null) continue;
                 os.write(command.getBytes());
                 os.writeBytes(LINE_SEP);
                 os.flush();
@@ -222,10 +222,10 @@ public final class ShellUtils {
                 successMsg = new StringBuilder();
                 errorMsg = new StringBuilder();
                 successResult = new BufferedReader(
-                        new InputStreamReader(process.getInputStream(), "UTF-8")
+                        new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8)
                 );
                 errorResult = new BufferedReader(
-                        new InputStreamReader(process.getErrorStream(), "UTF-8")
+                        new InputStreamReader(process.getErrorStream(), StandardCharsets.UTF_8)
                 );
                 String line;
                 if ((line = successResult.readLine()) != null) {

@@ -1,6 +1,5 @@
 package com.thomas.core.constant;
 
-import android.Manifest;
 import android.Manifest.permission;
 import android.annotation.SuppressLint;
 import android.os.Build;
@@ -19,15 +18,15 @@ import java.lang.annotation.RetentionPolicy;
  */
 @SuppressLint("InlinedApi")
 public final class PermissionConstants {
-    public static final String CALENDAR = Manifest.permission_group.CALENDAR;
-    public static final String CAMERA = Manifest.permission_group.CAMERA;
-    public static final String CONTACTS = Manifest.permission_group.CONTACTS;
-    public static final String LOCATION = Manifest.permission_group.LOCATION;
-    public static final String MICROPHONE = Manifest.permission_group.MICROPHONE;
-    public static final String PHONE = Manifest.permission_group.PHONE;
-    public static final String SENSORS = Manifest.permission_group.SENSORS;
-    public static final String SMS = Manifest.permission_group.SMS;
-    public static final String STORAGE = Manifest.permission_group.STORAGE;
+    public static final String CALENDAR = "CALENDAR";
+    public static final String CAMERA = "CAMERA";
+    public static final String CONTACTS = "CONTACTS";
+    public static final String LOCATION = "LOCATION";
+    public static final String MICROPHONE = "MICROPHONE";
+    public static final String PHONE = "PHONE";
+    public static final String SENSORS = "SENSORS";
+    public static final String SMS = "SMS";
+    public static final String STORAGE = "STORAGE";
 
     private static final String[] GROUP_CALENDAR = {
             permission.READ_CALENDAR, permission.WRITE_CALENDAR
@@ -65,7 +64,13 @@ public final class PermissionConstants {
             permission.READ_EXTERNAL_STORAGE, permission.WRITE_EXTERNAL_STORAGE,
     };
 
+    @StringDef({CALENDAR, CAMERA, CONTACTS, LOCATION, MICROPHONE, PHONE, SENSORS, SMS, STORAGE,})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface Permission {
+    }
+
     public static String[] getPermissions(@Permission final String permission) {
+        if (permission == null) return new String[0];
         switch (permission) {
             case CALENDAR:
                 return GROUP_CALENDAR;
@@ -91,10 +96,5 @@ public final class PermissionConstants {
                 return GROUP_STORAGE;
         }
         return new String[]{permission};
-    }
-
-    @StringDef({CALENDAR, CAMERA, CONTACTS, LOCATION, MICROPHONE, PHONE, SENSORS, SMS, STORAGE,})
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface Permission {
     }
 }

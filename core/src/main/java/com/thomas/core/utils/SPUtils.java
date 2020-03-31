@@ -20,16 +20,10 @@ import java.util.Set;
  */
 @SuppressLint("ApplySharedPref")
 public final class SPUtils {
+
     private static final Map<String, SPUtils> SP_UTILS_MAP = new HashMap<>();
+
     private SharedPreferences sp;
-
-    private SPUtils(final String spName) {
-        sp = Utils.getApp().getSharedPreferences(spName, Context.MODE_PRIVATE);
-    }
-
-    private SPUtils(final String spName, final int mode) {
-        sp = Utils.getApp().getSharedPreferences(spName, mode);
-    }
 
     /**
      * Return the single {@link SPUtils} instance
@@ -82,16 +76,12 @@ public final class SPUtils {
         return spUtils;
     }
 
-    private static boolean isSpace(final String s) {
-        if (s == null) {
-            return true;
-        }
-        for (int i = 0, len = s.length(); i < len; ++i) {
-            if (!Character.isWhitespace(s.charAt(i))) {
-                return false;
-            }
-        }
-        return true;
+    private SPUtils(final String spName) {
+        sp = Utils.getApp().getSharedPreferences(spName, Context.MODE_PRIVATE);
+    }
+
+    private SPUtils(final String spName, final int mode) {
+        sp = Utils.getApp().getSharedPreferences(spName, mode);
     }
 
     /**
@@ -365,7 +355,7 @@ public final class SPUtils {
      * or {@code Collections.<String>emptySet()} otherwise
      */
     public Set<String> getStringSet(@NonNull final String key) {
-        return getStringSet(key, Collections.<String>emptySet());
+        return getStringSet(key, Collections.emptySet());
     }
 
     /**
@@ -442,5 +432,15 @@ public final class SPUtils {
         } else {
             sp.edit().clear().apply();
         }
+    }
+
+    private static boolean isSpace(final String s) {
+        if (s == null) return true;
+        for (int i = 0, len = s.length(); i < len; ++i) {
+            if (!Character.isWhitespace(s.charAt(i))) {
+                return false;
+            }
+        }
+        return true;
     }
 }
