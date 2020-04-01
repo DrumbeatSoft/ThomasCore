@@ -31,7 +31,6 @@ import static android.Manifest.permission.WRITE_SETTINGS;
  */
 public final class ScreenUtils {
 
-
     private ScreenUtils() {
         throw new UnsupportedOperationException("u can't instantiate me...");
     }
@@ -102,7 +101,7 @@ public final class ScreenUtils {
      * @return the density of screen
      */
     public static float getScreenDensity() {
-        return Utils.getApp().getResources().getDisplayMetrics().density;
+        return Resources.getSystem().getDisplayMetrics().density;
     }
 
     /**
@@ -111,7 +110,7 @@ public final class ScreenUtils {
      * @return the screen density expressed as dots-per-inch
      */
     public static int getScreenDensityDpi() {
-        return Utils.getApp().getResources().getDisplayMetrics().densityDpi;
+        return Resources.getSystem().getDisplayMetrics().densityDpi;
     }
 
     /**

@@ -12,10 +12,12 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresPermission;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.io.File;
 import java.io.InputStream;
 import java.io.Serializable;
-import java.util.LinkedList;
 import java.util.List;
 
 import static android.Manifest.permission.CALL_PHONE;
@@ -55,8 +57,8 @@ class UtilsBridge {
         UtilsActivityLifecycleImpl.INSTANCE.removeActivityLifecycleCallbacks(activity, callbacks);
     }
 
-    static LinkedList<Activity> getActivityList() {
-        return UtilsActivityLifecycleImpl.INSTANCE.mActivityList;
+    static List<Activity> getActivityList() {
+        return UtilsActivityLifecycleImpl.INSTANCE.getActivityList();
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -144,6 +146,21 @@ class UtilsBridge {
         return ConvertUtils.bytes2String(bytes);
     }
 
+    static byte[] jsonObject2Bytes(final JSONObject jsonObject) {
+        return ConvertUtils.jsonObject2Bytes(jsonObject);
+    }
+
+    static JSONObject bytes2JSONObject(final byte[] bytes) {
+        return ConvertUtils.bytes2JSONObject(bytes);
+    }
+
+    static byte[] jsonArray2Bytes(final JSONArray jsonArray) {
+        return ConvertUtils.jsonArray2Bytes(jsonArray);
+    }
+
+    static JSONArray bytes2JSONArray(final byte[] bytes) {
+        return ConvertUtils.bytes2JSONArray(bytes);
+    }
 
     static byte[] parcelable2Bytes(final Parcelable parcelable) {
         return ConvertUtils.parcelable2Bytes(parcelable);
@@ -243,11 +260,11 @@ class UtilsBridge {
     ///////////////////////////////////////////////////////////////////////////
     // ImageUtils
     ///////////////////////////////////////////////////////////////////////////
-    public static byte[] bitmap2Bytes(final Bitmap bitmap) {
+    static byte[] bitmap2Bytes(final Bitmap bitmap) {
         return ImageUtils.bitmap2Bytes(bitmap);
     }
 
-    public static byte[] bitmap2Bytes(final Bitmap bitmap, final Bitmap.CompressFormat format, int quality) {
+    static byte[] bitmap2Bytes(final Bitmap bitmap, final Bitmap.CompressFormat format, int quality) {
         return ImageUtils.bitmap2Bytes(bitmap, format, quality);
     }
 
@@ -313,6 +330,13 @@ class UtilsBridge {
 
 
     ///////////////////////////////////////////////////////////////////////////
+    // JsonUtils
+    ///////////////////////////////////////////////////////////////////////////
+    static String formatJson(String json) {
+        return JsonUtils.formatJson(json);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     // KeyboardUtils
     ///////////////////////////////////////////////////////////////////////////
     static void fixSoftInputLeaks(final Activity activity) {
@@ -358,26 +382,26 @@ class UtilsBridge {
     ///////////////////////////////////////////////////////////////////////////
     // ShellUtils
     ///////////////////////////////////////////////////////////////////////////
-    static ShellCommandResult execCmd(final String command, final boolean isRooted) {
-        return ShellCommandResult.parse(ShellUtils.execCmd(command, isRooted));
+    static ShellUtils.CommandResult execCmd(final String command, final boolean isRooted) {
+        return ShellUtils.execCmd(command, isRooted);
     }
 
     ///////////////////////////////////////////////////////////////////////////
     // SizeUtils
     ///////////////////////////////////////////////////////////////////////////
-    public static int dp2px(final float dpValue) {
+    static int dp2px(final float dpValue) {
         return SizeUtils.dp2px(dpValue);
     }
 
-    public static int px2dp(final float pxValue) {
+    static int px2dp(final float pxValue) {
         return SizeUtils.px2dp(pxValue);
     }
 
-    public static int sp2px(final float spValue) {
+    static int sp2px(final float spValue) {
         return SizeUtils.sp2px(spValue);
     }
 
-    public static int px2sp(final float pxValue) {
+    static int px2sp(final float pxValue) {
         return SizeUtils.px2sp(pxValue);
     }
 
@@ -458,28 +482,5 @@ class UtilsBridge {
     // class
     ///////////////////////////////////////////////////////////////////////////
     static abstract class Task<T> extends ThreadUtils.SimpleTask<T> {
-    }
-
-    static class ShellCommandResult {
-        int result;
-        String successMsg;
-        String errorMsg;
-
-        private ShellCommandResult(ShellUtils.CommandResult result) {
-            this.result = result.result;
-            this.successMsg = result.successMsg;
-            this.errorMsg = result.errorMsg;
-        }
-
-        static ShellCommandResult parse(ShellUtils.CommandResult result) {
-            return new ShellCommandResult(result);
-        }
-
-        @Override
-        public String toString() {
-            return "result: " + result + "\n" +
-                    "successMsg: " + successMsg + "\n" +
-                    "errorMsg: " + errorMsg;
-        }
     }
 }

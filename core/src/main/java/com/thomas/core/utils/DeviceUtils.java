@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.net.Uri;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
@@ -35,6 +36,7 @@ import static android.content.Context.WIFI_SERVICE;
  * @since 1.0.0
  */
 public final class DeviceUtils {
+
     private DeviceUtils() {
         throw new UnsupportedOperationException("u can't instantiate me...");
     }
@@ -263,7 +265,7 @@ public final class DeviceUtils {
     }
 
     private static String getMacAddressByFile() {
-        UtilsBridge.ShellCommandResult result = UtilsBridge.execCmd("getprop wifi.interface", false);
+        ShellUtils.CommandResult result = UtilsBridge.execCmd("getprop wifi.interface", false);
         if (result.result == 0) {
             String name = result.successMsg;
             if (name != null) {
@@ -328,7 +330,7 @@ public final class DeviceUtils {
      * @return {@code true}: yes<br>{@code false}: no
      */
     public static boolean isTablet() {
-        return (Utils.getApp().getResources().getConfiguration().screenLayout
+        return (Resources.getSystem().getConfiguration().screenLayout
                 & Configuration.SCREENLAYOUT_SIZE_MASK)
                 >= Configuration.SCREENLAYOUT_SIZE_LARGE;
     }
@@ -373,7 +375,7 @@ public final class DeviceUtils {
     }
 
 
-    private static final String KEY_UDID = "KEY_UDID";
+    private static final    String KEY_UDID = "KEY_UDID";
     private volatile static String udid;
 
     /**

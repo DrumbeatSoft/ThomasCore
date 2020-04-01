@@ -31,20 +31,20 @@ import androidx.core.view.ViewCompat;
  * @since 1.0.0
  */
 public class ClickUtils {
-    private static final int PRESSED_VIEW_SCALE_TAG = -1;
+    private static final int   PRESSED_VIEW_SCALE_TAG           = -1;
     private static final float PRESSED_VIEW_SCALE_DEFAULT_VALUE = -0.06f;
 
-    private static final int PRESSED_VIEW_ALPHA_TAG = -2;
-    private static final int PRESSED_VIEW_ALPHA_SRC_TAG = -3;
+    private static final int   PRESSED_VIEW_ALPHA_TAG           = -2;
+    private static final int   PRESSED_VIEW_ALPHA_SRC_TAG       = -3;
     private static final float PRESSED_VIEW_ALPHA_DEFAULT_VALUE = 0.8f;
 
-    private static final int PRESSED_BG_ALPHA_STYLE = 4;
+    private static final int   PRESSED_BG_ALPHA_STYLE         = 4;
     private static final float PRESSED_BG_ALPHA_DEFAULT_VALUE = 0.9f;
 
-    private static final int PRESSED_BG_DARK_STYLE = 5;
+    private static final int   PRESSED_BG_DARK_STYLE         = 5;
     private static final float PRESSED_BG_DARK_DEFAULT_VALUE = 0.9f;
 
-    private static final int DEBOUNCING_TAG = -7;
+    private static final int  DEBOUNCING_TAG           = -7;
     private static final long DEBOUNCING_DEFAULT_VALUE = 200;
 
     private ClickUtils() {
@@ -382,8 +382,8 @@ public class ClickUtils {
     }
 
     private static final long TIP_DURATION = 2000L;
-    private static long sLastClickMillis;
-    private static int sClickCount;
+    private static       long sLastClickMillis;
+    private static       int  sClickCount;
 
     public static void back2HomeFriendly(final CharSequence tip) {
         back2HomeFriendly(tip, TIP_DURATION, Back2HomeFriendlyListener.DEFAULT);
@@ -454,7 +454,7 @@ public class ClickUtils {
             return true;
         }
 
-        private long mDuration;
+        private long    mDuration;
         private boolean mIsGlobal;
 
         public OnDebouncingClickListener() {
@@ -496,11 +496,11 @@ public class ClickUtils {
 
         private static final long INTERVAL_DEFAULT_VALUE = 666;
 
-        private final int mTriggerClickCount;
+        private final int  mTriggerClickCount;
         private final long mClickInterval;
 
         private long mLastClickTime;
-        private int mClickCount;
+        private int  mClickCount;
 
         public OnMultiClickListener(int triggerClickCount) {
             this(triggerClickCount, INTERVAL_DEFAULT_VALUE);

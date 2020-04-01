@@ -12,8 +12,9 @@ import java.util.Map;
 
 public class UtilsTransActivity extends AppCompatActivity {
 
+
     private static final Map<UtilsTransActivity, TransActivityDelegate> CALLBACK_MAP = new HashMap<>();
-    private static TransActivityDelegate sDelegate;
+    private static       TransActivityDelegate                          sDelegate;
 
     public static void start(final TransActivityDelegate delegate) {
         start(null, delegate);

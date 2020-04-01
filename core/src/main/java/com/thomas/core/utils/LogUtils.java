@@ -844,9 +844,9 @@ public final class LogUtils {
                 return UtilsBridge.getFullStackTrace((Throwable) object);
             if (object instanceof Bundle) return bundle2String((Bundle) object);
             if (object instanceof Intent) return intent2String((Intent) object);
-            if (type == XML)
+            if (type == XML) {
                 return formatXml(object.toString());
-
+            }
             return object.toString();
         }
 
@@ -1019,6 +1019,7 @@ public final class LogUtils {
             sb.append("NULL");
             sb.append("}");
         }
+
 
         private static String formatXml(String xml) {
             try {

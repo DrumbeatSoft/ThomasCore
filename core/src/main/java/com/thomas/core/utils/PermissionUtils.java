@@ -18,6 +18,7 @@ import androidx.core.content.ContextCompat;
 
 import com.thomas.core.constant.PermissionConstants;
 import com.thomas.core.constant.PermissionConstants.Permission;
+import com.thomas.core.utils.PermissionUtils.OnRationaleListener.ShouldRequest;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,16 +37,16 @@ import java.util.Set;
 public final class PermissionUtils {
     private static PermissionUtils sInstance;
 
-    private String[] mPermissionsParam;
+    private String[]            mPermissionsParam;
     private OnRationaleListener mOnRationaleListener;
-    private SimpleCallback mSimpleCallback;
-    private FullCallback mFullCallback;
-    private ThemeCallback mThemeCallback;
-    private Set<String> mPermissions;
-    private List<String> mPermissionsRequest;
-    private List<String> mPermissionsGranted;
-    private List<String> mPermissionsDenied;
-    private List<String> mPermissionsDeniedForever;
+    private SimpleCallback      mSimpleCallback;
+    private FullCallback        mFullCallback;
+    private ThemeCallback       mThemeCallback;
+    private Set<String>         mPermissions;
+    private List<String>        mPermissionsRequest;
+    private List<String>        mPermissionsGranted;
+    private List<String>        mPermissionsDenied;
+    private List<String>        mPermissionsDeniedForever;
 
     private static SimpleCallback sSimpleCallback4WriteSettings;
     private static SimpleCallback sSimpleCallback4DrawOverlays;
@@ -301,7 +302,7 @@ public final class PermissionUtils {
 
     private void rationalInner(final UtilsTransActivity activity, final Runnable againRunnable) {
         getPermissionsStatus(activity);
-        mOnRationaleListener.rationale(activity, new OnRationaleListener.ShouldRequest() {
+        mOnRationaleListener.rationale(activity, new ShouldRequest() {
             @Override
             public void again(boolean again) {
                 if (again) {
@@ -360,10 +361,10 @@ public final class PermissionUtils {
     @RequiresApi(api = Build.VERSION_CODES.M)
     static final class PermissionActivityImpl extends UtilsTransActivity.TransActivityDelegate {
 
-        private static final String TYPE = "TYPE";
-        private static final int TYPE_RUNTIME = 0x01;
-        private static final int TYPE_WRITE_SETTINGS = 0x02;
-        private static final int TYPE_DRAW_OVERLAYS = 0x03;
+        private static final String TYPE                = "TYPE";
+        private static final int    TYPE_RUNTIME        = 0x01;
+        private static final int    TYPE_WRITE_SETTINGS = 0x02;
+        private static final int    TYPE_DRAW_OVERLAYS  = 0x03;
 
         private static PermissionActivityImpl INSTANCE = new PermissionActivityImpl();
 

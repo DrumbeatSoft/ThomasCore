@@ -41,7 +41,7 @@ public final class UriUtils {
      */
     public static Uri file2Uri(@NonNull final File file) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            String authority = Utils.getApp().getPackageName() + ".thomas.provider";
+            String authority = Utils.getApp().getPackageName() + ".utilcode.provider";
             return FileProvider.getUriForFile(Utils.getApp(), authority, file);
         } else {
             return Uri.fromFile(file);
@@ -113,8 +113,8 @@ public final class UriUtils {
                             if (!mounted) continue;
 
                             //Primary storage is already handled.
-                            if ((Boolean) isPrimary.invoke(storageVolumeElement)
-                                    && (Boolean) isEmulated.invoke(storageVolumeElement)) {
+                            if (isPrimary.invoke(storageVolumeElement)
+                                    && isEmulated.invoke(storageVolumeElement)) {
                                 continue;
                             }
 

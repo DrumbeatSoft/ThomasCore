@@ -105,7 +105,7 @@ public final class AppUtils {
      * @return {@code true}: yes<br>{@code false}: no
      */
     public static boolean isAppRoot() {
-        UtilsBridge.ShellCommandResult result = UtilsBridge.execCmd("echo root", true);
+        ShellUtils.CommandResult result = UtilsBridge.execCmd("echo root", true);
         if (result.result == 0) return true;
         if (result.errorMsg != null) {
             Log.d("AppUtils", "isAppRoot() called" + result.errorMsg);
@@ -698,13 +698,13 @@ public final class AppUtils {
      */
     public static class AppInfo {
 
-        private String packageName;
-        private String name;
+        private String   packageName;
+        private String   name;
         private Drawable icon;
-        private String packagePath;
-        private String versionName;
-        private int versionCode;
-        private boolean isSystem;
+        private String   packagePath;
+        private String   versionName;
+        private int      versionCode;
+        private boolean  isSystem;
 
         public Drawable getIcon() {
             return icon;

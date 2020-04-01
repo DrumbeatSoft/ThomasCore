@@ -26,7 +26,7 @@ import java.util.Locale;
  * @since 1.0.0
  */
 public class LanguageUtils {
-    private static final String KEY_LOCALE = "KEY_LOCALE";
+    private static final String KEY_LOCALE          = "KEY_LOCALE";
     private static final String VALUE_FOLLOW_SYSTEM = "VALUE_FOLLOW_SYSTEM";
 
     private LanguageUtils() {

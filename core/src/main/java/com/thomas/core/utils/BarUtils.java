@@ -41,8 +41,8 @@ public final class BarUtils {
     ///////////////////////////////////////////////////////////////////////////
 
     private static final String TAG_STATUS_BAR = "TAG_STATUS_BAR";
-    private static final String TAG_OFFSET = "TAG_OFFSET";
-    private static final int KEY_OFFSET = -123;
+    private static final String TAG_OFFSET     = "TAG_OFFSET";
+    private static final int    KEY_OFFSET     = -123;
 
     private BarUtils() {
         throw new UnsupportedOperationException("u can't instantiate me...");
@@ -54,7 +54,7 @@ public final class BarUtils {
      * @return the status bar's height
      */
     public static int getStatusBarHeight() {
-        Resources resources = Utils.getApp().getResources();
+        Resources resources = Resources.getSystem();
         int resourceId = resources.getIdentifier("status_bar_height", "dimen", "android");
         return resources.getDimensionPixelSize(resourceId);
     }
@@ -430,7 +430,7 @@ public final class BarUtils {
         TypedValue tv = new TypedValue();
         if (Utils.getApp().getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
             return TypedValue.complexToDimensionPixelSize(
-                    tv.data, Utils.getApp().getResources().getDisplayMetrics()
+                    tv.data, Resources.getSystem().getDisplayMetrics()
             );
         }
         return 0;
@@ -480,7 +480,7 @@ public final class BarUtils {
      * @return the navigation bar's height
      */
     public static int getNavBarHeight() {
-        Resources res = Utils.getApp().getResources();
+        Resources res = Resources.getSystem();
         int resourceId = res.getIdentifier("navigation_bar_height", "dimen", "android");
         if (resourceId != 0) {
             return res.getDimensionPixelSize(resourceId);
@@ -514,9 +514,7 @@ public final class BarUtils {
             final View child = decorView.getChildAt(i);
             final int id = child.getId();
             if (id != View.NO_ID) {
-                String resourceEntryName = Utils.getApp()
-                        .getResources()
-                        .getResourceEntryName(id);
+                String resourceEntryName = Resources.getSystem().getResourceEntryName(id);
                 if ("navigationBarBackground".equals(resourceEntryName)) {
                     child.setVisibility(isVisible ? View.VISIBLE : View.INVISIBLE);
                 }
@@ -557,9 +555,7 @@ public final class BarUtils {
             final View child = decorView.getChildAt(i);
             final int id = child.getId();
             if (id != View.NO_ID) {
-                String resourceEntryName = Utils.getApp()
-                        .getResources()
-                        .getResourceEntryName(id);
+                String resourceEntryName = Resources.getSystem().getResourceEntryName(id);
                 if ("navigationBarBackground".equals(resourceEntryName)
                         && child.getVisibility() == View.VISIBLE) {
                     isVisible = true;

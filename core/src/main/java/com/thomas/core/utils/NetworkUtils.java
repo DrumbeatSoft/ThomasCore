@@ -694,7 +694,7 @@ public final class NetworkUtils {
             return LazyHolder.INSTANCE;
         }
 
-        private NetworkType mType;
+        private NetworkType                         mType;
         private Set<OnNetworkStatusChangedListener> mListeners = new HashSet<>();
 
         void registerListener(final OnNetworkStatusChangedListener listener) {
@@ -743,7 +743,6 @@ public final class NetworkUtils {
                     public void run() {
                         NetworkType networkType = NetworkUtils.getNetworkType();
                         if (mType == networkType) return;
-                        LogUtils.e(networkType);
                         mType = networkType;
                         if (networkType == NetworkType.NETWORK_NO) {
                             for (OnNetworkStatusChangedListener listener : mListeners) {

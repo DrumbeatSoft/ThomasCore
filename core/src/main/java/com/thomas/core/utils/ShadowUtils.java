@@ -1,7 +1,6 @@
 package com.thomas.core.utils;
 
 import android.content.res.ColorStateList;
-import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.ColorFilter;
@@ -9,7 +8,7 @@ import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PixelFormat;
-import android.graphics.PorterDuff;
+import android.graphics.PorterDuff.Mode;
 import android.graphics.RadialGradient;
 import android.graphics.Rect;
 import android.graphics.RectF;
@@ -58,23 +57,26 @@ public class ShadowUtils {
     public static class Config {
 
         private static final int SHADOW_COLOR_DEFAULT = 0xb0_000000;
-        private static final int SHADOW_SIZE = dp2px(8);
+        private static final int SHADOW_SIZE          = UtilsBridge.dp2px(8);
 
-        private float mShadowRadius = -1;
-        private float mShadowSizeNormal = -1;
-        private float mShadowSizePressed = -1;
-        private float mShadowMaxSizeNormal = -1;
-        private float mShadowMaxSizePressed = -1;
-        private int mShadowColorNormal = SHADOW_COLOR_DEFAULT;
-        private int mShadowColorPressed = SHADOW_COLOR_DEFAULT;
-        private boolean isCircle = false;
+        private float   mShadowRadius         = -1;
+        private float   mShadowSizeNormal     = -1;
+        private float   mShadowSizePressed    = -1;
+        private float   mShadowMaxSizeNormal  = -1;
+        private float   mShadowMaxSizePressed = -1;
+        private int     mShadowColorNormal    = SHADOW_COLOR_DEFAULT;
+        private int     mShadowColorPressed   = SHADOW_COLOR_DEFAULT;
+        private boolean isCircle              = false;
 
         public Config() {
         }
 
-        private static int dp2px(final float dpValue) {
-            final float scale = Resources.getSystem().getDisplayMetrics().density;
-            return (int) (dpValue * scale + 0.5f);
+        public Config setShadowRadius(float radius) {
+            this.mShadowRadius = radius;
+            if (isCircle) {
+                throw new IllegalArgumentException("Set circle needn't set radius.");
+            }
+            return this;
         }
 
         public Config setCircle() {
@@ -134,18 +136,10 @@ public class ShadowUtils {
         }
 
         private float getShadowRadius() {
-            if (mShadowRadius == -1) {
+            if (mShadowRadius < 0) {
                 mShadowRadius = 0;
             }
             return mShadowRadius;
-        }
-
-        public Config setShadowRadius(float radius) {
-            this.mShadowRadius = radius;
-            if (isCircle) {
-                throw new IllegalArgumentException("Set circle needn't set radius.");
-            }
-            return this;
         }
 
         private float getShadowSizeNormal() {
@@ -180,26 +174,37 @@ public class ShadowUtils {
     public static class ShadowDrawable extends DrawableWrapper {
         // used to calculate content padding
         private static final double COS_45 = Math.cos(Math.toRadians(45));
-        private final int mShadowStartColor;
-        private final int mShadowEndColor;
+
         private float mShadowMultiplier = 1f;
-        private float mShadowTopScale = 1f;
-        private float mShadowHorizScale = 1f;
+
+        private float mShadowTopScale    = 1f;
+        private float mShadowHorizScale  = 1f;
         private float mShadowBottomScale = 1f;
+
         private Paint mCornerShadowPaint;
         private Paint mEdgeShadowPaint;
+
         private RectF mContentBounds;
+
         private float mCornerRadius;
+
         private Path mCornerShadowPath;
+
         // updated value with inset
         private float mMaxShadowSize;
         // actual value set by developer
         private float mRawMaxShadowSize;
+
         // multiplied value to account for shadow offset
         private float mShadowSize;
         // actual value set by developer
         private float mRawShadowSize;
+
         private boolean mDirty = true;
+
+        private final int mShadowStartColor;
+        private final int mShadowEndColor;
+
         private boolean mAddPaddingForCorners = false;
 
         private float mRotation;
@@ -234,15 +239,6 @@ public class ShadowUtils {
         private static int toEven(float value) {
             int i = Math.round(value);
             return (i % 2 == 1) ? i - 1 : i;
-        }
-
-        private static float calculateHorizontalPadding(float maxShadowSize, float cornerRadius,
-                                                        boolean addPaddingForCorners) {
-            if (addPaddingForCorners) {
-                return (float) (maxShadowSize + (1 - COS_45) * cornerRadius);
-            } else {
-                return maxShadowSize;
-            }
         }
 
         public void setAddPaddingForCorners(boolean addPaddingForCorners) {
@@ -301,9 +297,28 @@ public class ShadowUtils {
             }
         }
 
+        private static float calculateHorizontalPadding(float maxShadowSize, float cornerRadius,
+                                                        boolean addPaddingForCorners) {
+            if (addPaddingForCorners) {
+                return (float) (maxShadowSize + (1 - COS_45) * cornerRadius);
+            } else {
+                return maxShadowSize;
+            }
+        }
+
         @Override
         public int getOpacity() {
             return PixelFormat.TRANSLUCENT;
+        }
+
+        public void setCornerRadius(float radius) {
+            radius = Math.round(radius);
+            if (mCornerRadius == radius) {
+                return;
+            }
+            mCornerRadius = radius;
+            mDirty = true;
+            invalidateSelf();
         }
 
         @Override
@@ -496,30 +511,20 @@ public class ShadowUtils {
             return mCornerRadius;
         }
 
-        public void setCornerRadius(float radius) {
-            radius = Math.round(radius);
-            if (mCornerRadius == radius) {
-                return;
-            }
-            mCornerRadius = radius;
-            mDirty = true;
-            invalidateSelf();
+        public void setShadowSize(float size) {
+            setShadowSize(size, mRawMaxShadowSize);
+        }
+
+        public void setMaxShadowSize(float size) {
+            setShadowSize(mRawShadowSize, size);
         }
 
         public float getShadowSize() {
             return mRawShadowSize;
         }
 
-        public void setShadowSize(float size) {
-            setShadowSize(size, mRawMaxShadowSize);
-        }
-
         public float getMaxShadowSize() {
             return mRawMaxShadowSize;
-        }
-
-        public void setMaxShadowSize(float size) {
-            setShadowSize(mRawShadowSize, size);
         }
 
         public float getMinWidth() {
@@ -542,162 +547,130 @@ public class ShadowUtils {
             this.setWrappedDrawable(drawable);
         }
 
-        @Override
         public void draw(Canvas canvas) {
             this.mDrawable.draw(canvas);
         }
 
-        @Override
         protected void onBoundsChange(Rect bounds) {
             this.mDrawable.setBounds(bounds);
         }
 
-        @Override
-        public int getChangingConfigurations() {
-            return this.mDrawable.getChangingConfigurations();
-        }
-
-        @Override
         public void setChangingConfigurations(int configs) {
             this.mDrawable.setChangingConfigurations(configs);
         }
 
-        @Override
+        public int getChangingConfigurations() {
+            return this.mDrawable.getChangingConfigurations();
+        }
+
         public void setDither(boolean dither) {
             this.mDrawable.setDither(dither);
         }
 
-        @Override
         public void setFilterBitmap(boolean filter) {
             this.mDrawable.setFilterBitmap(filter);
         }
 
-        @Override
         public void setAlpha(int alpha) {
             this.mDrawable.setAlpha(alpha);
         }
 
-        @Override
         public void setColorFilter(ColorFilter cf) {
             this.mDrawable.setColorFilter(cf);
         }
 
-        @Override
         public boolean isStateful() {
             return this.mDrawable.isStateful();
         }
 
-        @Override
         public boolean setState(int[] stateSet) {
             return this.mDrawable.setState(stateSet);
         }
 
-        @Override
         public int[] getState() {
             return this.mDrawable.getState();
         }
 
-        @Override
         public void jumpToCurrentState() {
             DrawableCompat.jumpToCurrentState(this.mDrawable);
         }
 
-        @Override
         public Drawable getCurrent() {
             return this.mDrawable.getCurrent();
         }
 
-        @Override
         public boolean setVisible(boolean visible, boolean restart) {
             return super.setVisible(visible, restart) || this.mDrawable.setVisible(visible, restart);
         }
 
-        @Override
         public int getOpacity() {
             return this.mDrawable.getOpacity();
         }
 
-        @Override
         public Region getTransparentRegion() {
             return this.mDrawable.getTransparentRegion();
         }
 
-        @Override
         public int getIntrinsicWidth() {
             return this.mDrawable.getIntrinsicWidth();
         }
 
-        @Override
         public int getIntrinsicHeight() {
             return this.mDrawable.getIntrinsicHeight();
         }
 
-        @Override
         public int getMinimumWidth() {
             return this.mDrawable.getMinimumWidth();
         }
 
-        @Override
         public int getMinimumHeight() {
             return this.mDrawable.getMinimumHeight();
         }
 
-        @Override
         public boolean getPadding(Rect padding) {
             return this.mDrawable.getPadding(padding);
         }
 
-        @Override
         public void invalidateDrawable(Drawable who) {
             this.invalidateSelf();
         }
 
-        @Override
         public void scheduleDrawable(Drawable who, Runnable what, long when) {
             this.scheduleSelf(what, when);
         }
 
-        @Override
         public void unscheduleDrawable(Drawable who, Runnable what) {
             this.unscheduleSelf(what);
         }
 
-        @Override
         protected boolean onLevelChange(int level) {
             return this.mDrawable.setLevel(level);
         }
 
-        @Override
-        public boolean isAutoMirrored() {
-            return DrawableCompat.isAutoMirrored(this.mDrawable);
-        }
-
-        @Override
         public void setAutoMirrored(boolean mirrored) {
             DrawableCompat.setAutoMirrored(this.mDrawable, mirrored);
         }
 
-        @Override
+        public boolean isAutoMirrored() {
+            return DrawableCompat.isAutoMirrored(this.mDrawable);
+        }
+
         public void setTint(int tint) {
             DrawableCompat.setTint(this.mDrawable, tint);
         }
 
-        @Override
         public void setTintList(ColorStateList tint) {
             DrawableCompat.setTintList(this.mDrawable, tint);
         }
 
-        @Override
-        public void setTintMode(PorterDuff.Mode tintMode) {
+        public void setTintMode(Mode tintMode) {
             DrawableCompat.setTintMode(this.mDrawable, tintMode);
         }
 
-        @Override
         public void setHotspot(float x, float y) {
             DrawableCompat.setHotspot(this.mDrawable, x, y);
         }
 
-        @Override
         public void setHotspotBounds(int left, int top, int right, int bottom) {
             DrawableCompat.setHotspotBounds(this.mDrawable, left, top, right, bottom);
         }
@@ -708,7 +681,7 @@ public class ShadowUtils {
 
         public void setWrappedDrawable(Drawable drawable) {
             if (this.mDrawable != null) {
-                this.mDrawable.setCallback((Callback) null);
+                this.mDrawable.setCallback(null);
             }
 
             this.mDrawable = drawable;

@@ -34,6 +34,7 @@ import java.util.List;
  * @since 1.0.0
  */
 public final class ActivityUtils {
+
     private ActivityUtils() {
         throw new UnsupportedOperationException("u can't instantiate me...");
     }
@@ -1541,7 +1542,7 @@ public final class ActivityUtils {
      * @param activity The activity.
      */
     public static void finishActivity(@NonNull final Activity activity) {
-        finishActivity(activity, false);
+        finishActivity(activity, true);
     }
 
     /**

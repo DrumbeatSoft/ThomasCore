@@ -38,17 +38,17 @@ import java.lang.reflect.Field;
  */
 public final class ToastUtils {
 
-    private static final int COLOR_DEFAULT = 0xFEFFFFFF;
-    private static final String NULL = "null";
+    private static final int    COLOR_DEFAULT = 0xFEFFFFFF;
+    private static final String NULL          = "null";
 
     private static IToast iToast;
-    private static int sGravity = -1;
-    private static int sXOffset = -1;
-    private static int sYOffset = -1;
-    private static int sBgColor = COLOR_DEFAULT;
-    private static int sBgResource = -1;
-    private static int sMsgColor = COLOR_DEFAULT;
-    private static int sMsgTextSize = -1;
+    private static int    sGravity     = -1;
+    private static int    sXOffset     = -1;
+    private static int    sYOffset     = -1;
+    private static int    sBgColor     = COLOR_DEFAULT;
+    private static int    sBgResource  = -1;
+    private static int    sMsgColor    = COLOR_DEFAULT;
+    private static int    sMsgTextSize = -1;
 
     private ToastUtils() {
         throw new UnsupportedOperationException("u can't instantiate me...");
@@ -422,7 +422,7 @@ public final class ToastUtils {
 
     static class ToastWithoutNotification extends AbsToast {
 
-        private View mView;
+        private View          mView;
         private WindowManager mWM;
 
         private WindowManager.LayoutParams mParams = new WindowManager.LayoutParams();

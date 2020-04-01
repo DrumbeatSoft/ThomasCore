@@ -29,11 +29,11 @@ import static android.Manifest.permission.EXPAND_STATUS_BAR;
  */
 public class NotificationUtils {
     public static final int IMPORTANCE_UNSPECIFIED = -1000;
-    public static final int IMPORTANCE_NONE = 0;
-    public static final int IMPORTANCE_MIN = 1;
-    public static final int IMPORTANCE_LOW = 2;
-    public static final int IMPORTANCE_DEFAULT = 3;
-    public static final int IMPORTANCE_HIGH = 4;
+    public static final int IMPORTANCE_NONE        = 0;
+    public static final int IMPORTANCE_MIN         = 1;
+    public static final int IMPORTANCE_LOW         = 2;
+    public static final int IMPORTANCE_DEFAULT     = 3;
+    public static final int IMPORTANCE_HIGH        = 4;
 
     @IntDef({IMPORTANCE_UNSPECIFIED, IMPORTANCE_NONE, IMPORTANCE_MIN, IMPORTANCE_LOW, IMPORTANCE_DEFAULT, IMPORTANCE_HIGH})
     @Retention(RetentionPolicy.SOURCE)

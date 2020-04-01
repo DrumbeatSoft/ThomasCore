@@ -19,10 +19,15 @@ import java.lang.annotation.RetentionPolicy;
  */
 public class TouchUtils {
     public static final int UNKNOWN = 0;
-    public static final int LEFT = 1;
-    public static final int UP = 2;
-    public static final int RIGHT = 4;
-    public static final int DOWN = 8;
+    public static final int LEFT    = 1;
+    public static final int UP      = 2;
+    public static final int RIGHT   = 4;
+    public static final int DOWN    = 8;
+
+    @IntDef({LEFT, UP, RIGHT, DOWN})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface Direction {
+    }
 
     private TouchUtils() {
         throw new UnsupportedOperationException("u can't instantiate me...");
@@ -35,11 +40,6 @@ public class TouchUtils {
         v.setOnTouchListener(listener);
     }
 
-    @IntDef({LEFT, UP, RIGHT, DOWN})
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface Direction {
-    }
-
     public static abstract class OnTouchUtilsListener implements View.OnTouchListener {
 
         private static final int STATE_DOWN = 0;
@@ -50,11 +50,11 @@ public class TouchUtils {
 
         private int touchSlop;
         private int downX, downY, lastX, lastY;
-        private int state;
-        private int direction;
+        private int             state;
+        private int             direction;
         private VelocityTracker velocityTracker;
-        private int maximumFlingVelocity;
-        private int minimumFlingVelocity;
+        private int             maximumFlingVelocity;
+        private int             minimumFlingVelocity;
 
         public OnTouchUtilsListener() {
             resetTouch(-1, -1);

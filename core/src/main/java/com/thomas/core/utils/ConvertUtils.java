@@ -11,6 +11,9 @@ import android.view.View;
 import com.thomas.core.constant.MemoryConstants;
 import com.thomas.core.constant.TimeConstants;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -34,8 +37,8 @@ import java.util.List;
  * @since 1.0.0
  */
 public final class ConvertUtils {
-    private static final int BUFFER_SIZE = 8192;
-    private static final char[] hexDigits =
+    private static final int    BUFFER_SIZE = 8192;
+    private static final char[] hexDigits   =
             {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
 
     private ConvertUtils() {
@@ -209,6 +212,47 @@ public final class ConvertUtils {
         }
     }
 
+    /**
+     * Bytes to JSONObject.
+     */
+    public static JSONObject bytes2JSONObject(final byte[] bytes) {
+        if (bytes == null) return null;
+        try {
+            return new JSONObject(new String(bytes));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * JSONObject to bytes.
+     */
+    public static byte[] jsonObject2Bytes(final JSONObject jsonObject) {
+        if (jsonObject == null) return null;
+        return jsonObject.toString().getBytes();
+    }
+
+    /**
+     * Bytes to JSONArray.
+     */
+    public static JSONArray bytes2JSONArray(final byte[] bytes) {
+        if (bytes == null) return null;
+        try {
+            return new JSONArray(new String(bytes));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * JSONArray to bytes.
+     */
+    public static byte[] jsonArray2Bytes(final JSONArray jsonArray) {
+        if (jsonArray == null) return null;
+        return jsonArray.toString().getBytes();
+    }
 
     /**
      * Bytes to Parcelable
