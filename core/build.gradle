@@ -34,7 +34,7 @@ dependencies {
     api 'androidx.multidex:multidex:2.0.1'
     implementation 'org.jetbrains:annotations:15.0'
     implementation 'androidx.annotation:annotation:1.1.0'
-    api "androidx.fragment:fragment:1.2.4"
-    api "androidx.lifecycle:lifecycle-viewmodel:2.2.0"
-    api "androidx.lifecycle:lifecycle-extensions:2.2.0"
+    compileOnly "androidx.fragment:fragment:1.2.4"
+    compileOnly "androidx.lifecycle:lifecycle-viewmodel:2.2.0"
+    compileOnly "androidx.lifecycle:lifecycle-extensions:2.2.0"
 }

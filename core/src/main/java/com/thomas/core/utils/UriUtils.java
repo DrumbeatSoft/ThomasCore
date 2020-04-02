@@ -113,8 +113,8 @@ public final class UriUtils {
                             if (!mounted) continue;
 
                             //Primary storage is already handled.
-                            if (isPrimary.invoke(storageVolumeElement)
-                                    && isEmulated.invoke(storageVolumeElement)) {
+                            if ((Boolean) isPrimary.invoke(storageVolumeElement)
+                                    && (Boolean) isEmulated.invoke(storageVolumeElement)) {
                                 continue;
                             }
 
