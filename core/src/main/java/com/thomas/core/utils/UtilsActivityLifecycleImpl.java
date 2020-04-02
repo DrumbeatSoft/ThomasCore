@@ -9,8 +9,6 @@ import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.lifecycle.Lifecycle;
 
 import org.jetbrains.annotations.NotNull;
@@ -125,14 +123,9 @@ final class UtilsActivityLifecycleImpl implements Application.ActivityLifecycleC
     // lifecycle start
     ///////////////////////////////////////////////////////////////////////////
     @Override
-    public void onActivityPreCreated(@NonNull Activity activity, @Nullable Bundle savedInstanceState) {
+    public void onActivityCreated(@NotNull Activity activity, Bundle savedInstanceState) {
         UtilsBridge.applyLanguage(activity);
         setAnimatorsEnabled();
-        setTopActivity(activity);
-    }
-
-    @Override
-    public void onActivityCreated(@NotNull Activity activity, Bundle savedInstanceState) {
         setTopActivity(activity);
         consumeActivityLifecycleCallbacks(activity, Lifecycle.Event.ON_CREATE);
     }

@@ -1,7 +1,6 @@
 package com.thomas.core.utils;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
@@ -293,12 +292,7 @@ public final class AppUtils {
      * Exit the application.
      */
     public static void exitApp() {
-        List<Activity> activityList = UtilsBridge.getActivityList();
-        for (int i = activityList.size() - 1; i >= 0; --i) {// remove from top
-            Activity activity = activityList.get(i);
-            // sActivityList remove the index activity at onActivityDestroyed
-            activity.finish();
-        }
+        UtilsBridge.finishAllActivities();
         System.exit(0);
     }
 
