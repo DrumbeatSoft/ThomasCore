@@ -12,7 +12,6 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.StateListDrawable;
-import android.os.Build;
 import android.util.Log;
 import android.util.StateSet;
 import android.view.MotionEvent;
@@ -212,23 +211,23 @@ public class ClickUtils {
     }
 
     private static Drawable createAlphaDrawable(Drawable drawable, float alpha) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-            DrawableWrapperBefore21 drawableWrapper = new DrawableWrapperBefore21(drawable);
-            drawableWrapper.setAlphaFix((int) (alpha * 255));
-            return drawableWrapper;
-        }
-        drawable.setAlpha((int) (alpha * 255));
-        return drawable;
+//        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+        DrawableWrapperBefore21 drawableWrapper = new DrawableWrapperBefore21(drawable);
+        drawableWrapper.setAlphaFix((int) (alpha * 255));
+        return drawableWrapper;
+//        }
+//        drawable.setAlpha((int) (alpha * 255));
+//        return drawable;
     }
 
     private static Drawable createDarkDrawable(Drawable drawable, float alpha) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-            DrawableWrapperBefore21 drawableWrapper = new DrawableWrapperBefore21(drawable);
-            drawableWrapper.setColorFilterFix(getDarkColorFilter(alpha));
-            return drawableWrapper;
-        }
-        drawable.setColorFilter(getDarkColorFilter(alpha));
-        return drawable;
+//        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+        DrawableWrapperBefore21 drawableWrapper = new DrawableWrapperBefore21(drawable);
+        drawableWrapper.setColorFilterFix(getDarkColorFilter(alpha));
+        return drawableWrapper;
+//        }
+//        drawable.setColorFilter(getDarkColorFilter(alpha));
+//        return drawable;
     }
 
     private static ColorMatrixColorFilter getDarkColorFilter(float darkAlpha) {
