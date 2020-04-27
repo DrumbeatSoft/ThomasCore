@@ -136,7 +136,7 @@ public final class KeyboardUtils {
     public static void hideSoftInputByToggle(final Activity activity) {
         long nowMillis = System.currentTimeMillis();
         long delta = nowMillis - millis;
-        if (KeyboardUtils.isSoftInputVisible(activity) && Math.abs(delta) > 500) {
+        if (Math.abs(delta) > 500 && KeyboardUtils.isSoftInputVisible(activity)) {
             KeyboardUtils.toggleSoftInput();
         }
         millis = nowMillis;
@@ -244,7 +244,7 @@ public final class KeyboardUtils {
 
     /**
      * Fix the bug of 5497 in Android.
-     * <p>Don't set adjustResize</p>
+     * <p>It will clean the adjustResize</p>
      *
      * @param window The window.
      */

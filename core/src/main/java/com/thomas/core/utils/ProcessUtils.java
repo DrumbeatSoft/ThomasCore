@@ -38,6 +38,7 @@ import static android.Manifest.permission.KILL_BACKGROUND_PROCESSES;
  * @since 1.0.0
  */
 public final class ProcessUtils {
+
     private ProcessUtils() {
         throw new UnsupportedOperationException("u can't instantiate me...");
     }
@@ -230,17 +231,21 @@ public final class ProcessUtils {
     }
 
     private static String getCurrentProcessNameByAms() {
-        ActivityManager am = (ActivityManager) Utils.getApp().getSystemService(Context.ACTIVITY_SERVICE);
-        if (am == null) return "";
-        List<ActivityManager.RunningAppProcessInfo> info = am.getRunningAppProcesses();
-        if (info == null || info.size() == 0) return "";
-        int pid = android.os.Process.myPid();
-        for (ActivityManager.RunningAppProcessInfo aInfo : info) {
-            if (aInfo.pid == pid) {
-                if (aInfo.processName != null) {
-                    return aInfo.processName;
+        try {
+            ActivityManager am = (ActivityManager) Utils.getApp().getSystemService(Context.ACTIVITY_SERVICE);
+            if (am == null) return "";
+            List<ActivityManager.RunningAppProcessInfo> info = am.getRunningAppProcesses();
+            if (info == null || info.size() == 0) return "";
+            int pid = android.os.Process.myPid();
+            for (ActivityManager.RunningAppProcessInfo aInfo : info) {
+                if (aInfo.pid == pid) {
+                    if (aInfo.processName != null) {
+                        return aInfo.processName;
+                    }
                 }
             }
+        } catch (Exception e) {
+            return "";
         }
         return "";
     }

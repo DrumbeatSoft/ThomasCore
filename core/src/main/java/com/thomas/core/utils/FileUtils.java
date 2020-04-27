@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
 import android.net.Uri;
 import android.os.Build;
+import android.os.StatFs;
+import android.text.TextUtils;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -51,40 +53,49 @@ public class FileUtils {
     /**
      * Return whether the file exists.
      *
-     * @param filePath The path of file.
+     * @param file The file.
      * @return {@code true}: yes<br>{@code false}: no
      */
-    public static boolean isFileExists(final String filePath) {
-        if (Build.VERSION.SDK_INT < 29) {
-            return isFileExists(getFileByPath(filePath));
+    public static boolean isFileExists(final File file) {
+        if (file == null) return false;
+        if (file.exists()) {
+            return true;
         }
-        return isFileExists29(filePath);
-    }
-
-    private static boolean isFileExists29(String filePath) {
-        try {
-            Uri uri = Uri.parse(filePath);
-            ContentResolver cr = Utils.getApp().getContentResolver();
-            AssetFileDescriptor afd = cr.openAssetFileDescriptor(uri, "r");
-            if (afd == null) return false;
-            try {
-                afd.close();
-            } catch (IOException ignore) {
-            }
-        } catch (FileNotFoundException e) {
-            return false;
-        }
-        return true;
+        return isFileExists(file.getAbsolutePath());
     }
 
     /**
      * Return whether the file exists.
      *
-     * @param file The file.
+     * @param filePath The path of file.
      * @return {@code true}: yes<br>{@code false}: no
      */
-    public static boolean isFileExists(final File file) {
-        return file != null && file.exists();
+    public static boolean isFileExists(final String filePath) {
+        File file = getFileByPath(filePath);
+        if (file == null) return false;
+        if (file.exists()) {
+            return true;
+        }
+        return isFileExistsApi29(filePath);
+    }
+
+    private static boolean isFileExistsApi29(String filePath) {
+        if (Build.VERSION.SDK_INT >= 29) {
+            try {
+                Uri uri = Uri.parse(filePath);
+                ContentResolver cr = Utils.getApp().getContentResolver();
+                AssetFileDescriptor afd = cr.openAssetFileDescriptor(uri, "r");
+                if (afd == null) return false;
+                try {
+                    afd.close();
+                } catch (IOException ignore) {
+                }
+            } catch (FileNotFoundException e) {
+                return false;
+            }
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -636,7 +647,7 @@ public class FileUtils {
      * @return the files in directory
      */
     public static List<File> listFilesInDir(final String dirPath, Comparator<File> comparator) {
-        return listFilesInDir(getFileByPath(dirPath), false);
+        return listFilesInDir(getFileByPath(dirPath), false, comparator);
     }
 
     /**
@@ -1371,6 +1382,15 @@ public class FileUtils {
     /**
      * Notify system to scan the file.
      *
+     * @param filePath The path of file.
+     */
+    public static void notifySystemToScan(final String filePath) {
+        notifySystemToScan(getFileByPath(filePath));
+    }
+
+    /**
+     * Notify system to scan the file.
+     *
      * @param file The file.
      */
     public static void notifySystemToScan(final File file) {
@@ -1382,12 +1402,45 @@ public class FileUtils {
     }
 
     /**
-     * Notify system to scan the file.
+     * Return the total size of file system.
      *
-     * @param filePath The path of file.
+     * @param anyPathInFs Any path in file system.
+     * @return the total size of file system
      */
-    public static void notifySystemToScan(final String filePath) {
-        notifySystemToScan(getFileByPath(filePath));
+    public static long getFsTotalSize(String anyPathInFs) {
+        if (TextUtils.isEmpty(anyPathInFs)) return 0;
+        StatFs statFs = new StatFs(anyPathInFs);
+        long blockSize;
+        long totalSize;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR2) {
+            blockSize = statFs.getBlockSizeLong();
+            totalSize = statFs.getBlockCountLong();
+        } else {
+            blockSize = statFs.getBlockSize();
+            totalSize = statFs.getBlockCount();
+        }
+        return blockSize * totalSize;
+    }
+
+    /**
+     * Return the available size of file system.
+     *
+     * @param anyPathInFs Any path in file system.
+     * @return the available size of file system
+     */
+    public static long getFsAvailableSize(final String anyPathInFs) {
+        if (TextUtils.isEmpty(anyPathInFs)) return 0;
+        StatFs statFs = new StatFs(anyPathInFs);
+        long blockSize;
+        long availableSize;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR2) {
+            blockSize = statFs.getBlockSizeLong();
+            availableSize = statFs.getAvailableBlocksLong();
+        } else {
+            blockSize = statFs.getBlockSize();
+            availableSize = statFs.getAvailableBlocks();
+        }
+        return blockSize * availableSize;
     }
 
     ///////////////////////////////////////////////////////////////////////////

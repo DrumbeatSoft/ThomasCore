@@ -24,7 +24,7 @@ public final class CleanUtils {
      * @return {@code true}: success<br>{@code false}: fail
      */
     public static boolean cleanInternalCache() {
-        return cleanCustomDir(Utils.getApp().getCacheDir());
+        return UtilsBridge.deleteAllInDir(Utils.getApp().getCacheDir());
     }
 
     /**
@@ -34,7 +34,7 @@ public final class CleanUtils {
      * @return {@code true}: success<br>{@code false}: fail
      */
     public static boolean cleanInternalFiles() {
-        return cleanCustomDir(Utils.getApp().getFilesDir());
+        return UtilsBridge.deleteAllInDir(Utils.getApp().getFilesDir());
     }
 
     /**
@@ -44,7 +44,7 @@ public final class CleanUtils {
      * @return {@code true}: success<br>{@code false}: fail
      */
     public static boolean cleanInternalDbs() {
-        return cleanCustomDir(new File(Utils.getApp().getFilesDir().getParent(), "databases"));
+        return UtilsBridge.deleteAllInDir(new File(Utils.getApp().getFilesDir().getParent(), "databases"));
     }
 
     /**
@@ -65,7 +65,7 @@ public final class CleanUtils {
      * @return {@code true}: success<br>{@code false}: fail
      */
     public static boolean cleanInternalSp() {
-        return cleanCustomDir(new File(Utils.getApp().getFilesDir().getParent(), "shared_prefs"));
+        return UtilsBridge.deleteAllInDir(new File(Utils.getApp().getFilesDir().getParent(), "shared_prefs"));
     }
 
     /**
@@ -76,7 +76,7 @@ public final class CleanUtils {
      */
     public static boolean cleanExternalCache() {
         return Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())
-                && cleanCustomDir(Utils.getApp().getExternalCacheDir());
+                && UtilsBridge.deleteAllInDir(Utils.getApp().getExternalCacheDir());
     }
 
     /**
@@ -86,16 +86,6 @@ public final class CleanUtils {
      * @return {@code true}: success<br>{@code false}: fail
      */
     public static boolean cleanCustomDir(final String dirPath) {
-        return cleanCustomDir(UtilsBridge.getFileByPath(dirPath));
-    }
-
-    /**
-     * Clean the custom directory.
-     *
-     * @param dir The directory.
-     * @return {@code true}: success<br>{@code false}: fail
-     */
-    public static boolean cleanCustomDir(final File dir) {
-        return UtilsBridge.deleteFilesInDir(dir);
+        return UtilsBridge.deleteAllInDir(UtilsBridge.getFileByPath(dirPath));
     }
 }

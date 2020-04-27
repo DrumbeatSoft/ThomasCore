@@ -35,6 +35,7 @@ import java.util.List;
  */
 public final class ActivityUtils {
 
+
     private ActivityUtils() {
         throw new UnsupportedOperationException("u can't instantiate me...");
     }
@@ -1595,7 +1596,7 @@ public final class ActivityUtils {
      * @param clz The activity class.
      */
     public static void finishActivity(@NonNull final Class<? extends Activity> clz) {
-        finishActivity(clz, false);
+        finishActivity(clz, true);
     }
 
     /**
@@ -1861,7 +1862,7 @@ public final class ActivityUtils {
      */
     public static void finishAllActivitiesExceptNewest(final boolean isLoadAnim) {
         List<Activity> activities = UtilsBridge.getActivityList();
-        for (int i = 1; i < activities.size() - 1; i++) {
+        for (int i = 1; i < activities.size(); i++) {
             finishActivity(activities.get(i), isLoadAnim);
         }
     }
@@ -1877,7 +1878,7 @@ public final class ActivityUtils {
     public static void finishAllActivitiesExceptNewest(@AnimRes final int enterAnim,
                                                        @AnimRes final int exitAnim) {
         List<Activity> activities = UtilsBridge.getActivityList();
-        for (int i = 1; i < activities.size() - 1; i++) {
+        for (int i = 1; i < activities.size(); i++) {
             finishActivity(activities.get(i), enterAnim, exitAnim);
         }
     }

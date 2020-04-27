@@ -13,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.Lifecycle;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -31,9 +32,13 @@ final class UtilsActivityLifecycleImpl implements Application.ActivityLifecycleC
     private int     mConfigCount     = 0;
     private boolean mIsBackground    = false;
 
-    void init() {
+    void init(Application app) {
+        app.registerActivityLifecycleCallbacks(this);
+    }
+
+    void unInit(Application app) {
         mActivityList.clear();
-        Utils.getApp().registerActivityLifecycleCallbacks(this);
+        app.unregisterActivityLifecycleCallbacks(this);
     }
 
     Activity getTopActivity() {
@@ -73,6 +78,27 @@ final class UtilsActivityLifecycleImpl implements Application.ActivityLifecycleC
                 addActivityLifecycleCallbacksInner(activity, listener);
             }
         });
+    }
+
+    Application getApplicationByReflect() {
+        try {
+            Class activityThreadClass = Class.forName("android.app.ActivityThread");
+            Object thread = getActivityThread();
+            Object app = activityThreadClass.getMethod("getApplication").invoke(thread);
+            if (app == null) {
+                return null;
+            }
+            return (Application) app;
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     private void addActivityLifecycleCallbacksInner(final Activity activity,
@@ -257,6 +283,9 @@ final class UtilsActivityLifecycleImpl implements Application.ActivityLifecycleC
         }
     }
 
+    /**
+     * @return the activities which topActivity is first position
+     */
     private List<Activity> getActivitiesByReflect() {
         LinkedList<Activity> list = new LinkedList<>();
         Activity topActivity = null;

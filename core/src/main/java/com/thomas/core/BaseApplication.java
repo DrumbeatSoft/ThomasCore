@@ -77,7 +77,8 @@ public abstract class BaseApplication extends Application {
                     public String format(ArrayList list) {
                         return "LogUtils Formatter ArrayList { " + list.toString() + " }";
                     }
-                });
+                })
+                .setFileWriter(null);
         LogUtils.d(config.toString());
     }
 

@@ -3,6 +3,7 @@ package com.thomas.core.utils;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Application;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.Lifecycle;
@@ -29,26 +30,42 @@ public final class Utils {
      * @param app application
      */
     public static void init(final Application app) {
-        if (sApp != null) return;
+        if (app == null) {
+            Log.e("Utils", "app is null.");
+            return;
+        }
+        if (sApp == null) {
+            sApp = app;
+            UtilsBridge.init(sApp);
+            UtilsBridge.preLoad();
+            return;
+        }
+        if (sApp.equals(app)) return;
+        UtilsBridge.unInit(sApp);
         sApp = app;
-        UtilsBridge.init();
+        UtilsBridge.init(sApp);
     }
 
     /**
      * Return the Application object.
+     * <p>Main process get app by UtilsFileProvider,
+     * and other process get app by reflect.</p>
      *
      * @return the Application object
      */
     public static Application getApp() {
         if (sApp != null) return sApp;
-        throw new NullPointerException("UtilsFileProvider load failed.");
+        init(UtilsBridge.getApplicationByReflect());
+        if (sApp == null) throw new NullPointerException("reflect failed.");
+        Log.i("Utils", UtilsBridge.getCurrentProcessName() + " reflect app success.");
+        return sApp;
     }
 
     ///////////////////////////////////////////////////////////////////////////
     // interface
     ///////////////////////////////////////////////////////////////////////////
 
-    public abstract static class Task<Result> extends UtilsBridge.Task<Result> {
+    public abstract static class Task<Result> extends ThreadUtils.SimpleTask<Result> {
 
         private Consumer<Result> mConsumer;
 
@@ -85,10 +102,6 @@ public final class Utils {
         public void onActivityDestroyed(@NonNull Activity activity) {/**/}
 
         public void onLifecycleChanged(@NonNull Activity activity, Lifecycle.Event event) {/**/}
-    }
-
-    public interface OnActivityDestroyedListener {
-        void onActivityDestroyed(Activity activity);
     }
 
     public interface Consumer<T> {

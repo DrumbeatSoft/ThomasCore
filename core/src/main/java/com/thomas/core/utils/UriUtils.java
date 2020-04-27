@@ -17,6 +17,9 @@ import androidx.annotation.NonNull;
 import androidx.core.content.FileProvider;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 
@@ -31,6 +34,18 @@ public final class UriUtils {
 
     private UriUtils() {
         throw new UnsupportedOperationException("u can't instantiate me...");
+    }
+
+    /**
+     * Resource to uri.
+     * <p>res2Uri([res type]/[res name]) -> res2Uri(drawable/icon), res2Uri(raw/icon)</p>
+     * <p>res2Uri([resource_id]) -> res2Uri(R.drawable.icon)</p>
+     *
+     * @param resPath The path of res.
+     * @return uri
+     */
+    public static Uri res2Uri(String resPath) {
+        return Uri.parse("android.resource://" + Utils.getApp().getPackageName() + "/" + resPath);
     }
 
     /**
@@ -55,12 +70,23 @@ public final class UriUtils {
      * @return file
      */
     public static File uri2File(@NonNull final Uri uri) {
+        File file = uri2FileReal(uri);
+        if (file != null) return file;
+        return copyUri2Cache(uri);
+    }
+
+    /**
+     * Uri to file.
+     *
+     * @param uri The uri.
+     * @return file
+     */
+    private static File uri2FileReal(@NonNull final Uri uri) {
         Log.d("UriUtils", uri.toString());
         String authority = uri.getAuthority();
         String scheme = uri.getScheme();
         String path = uri.getPath();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
-                && path != null) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && path != null) {
             String[] externals = new String[]{"/external", "/external_path"};
             for (String external : externals) {
                 if (path.startsWith(external + "/")) {
@@ -133,19 +159,31 @@ public final class UriUtils {
             }// end 1_0
             else if ("com.android.providers.downloads.documents".equals(authority)) {
                 final String id = DocumentsContract.getDocumentId(uri);
-                if (!TextUtils.isEmpty(id)) {
+                if (TextUtils.isEmpty(id)) {
+                    Log.d("UriUtils", uri.toString() + " parse failed(id is null). -> 1_1");
+                    return null;
+                }
+                if (id.startsWith("raw:")) {
+                    return new File(id.substring(4));
+                }
+
+                String[] contentUriPrefixesToTry = new String[]{
+                        "content://downloads/public_downloads",
+                        "content://downloads/all_downloads",
+                        "content://downloads/my_downloads"
+                };
+
+                for (String contentUriPrefix : contentUriPrefixesToTry) {
+                    Uri contentUri = ContentUris.withAppendedId(Uri.parse(contentUriPrefix), Long.valueOf(id));
                     try {
-                        final Uri contentUri = ContentUris.withAppendedId(
-                                Uri.parse("content://downloads/public_downloads"),
-                                Long.valueOf(id)
-                        );
-                        return getFileFromUri(contentUri, "1_1");
-                    } catch (NumberFormatException e) {
-                        if (id.startsWith("raw:")) {
-                            return new File(id.substring(4));
+                        File file = getFileFromUri(contentUri, "1_1");
+                        if (file != null) {
+                            return file;
                         }
+                    } catch (Exception ignore) {
                     }
                 }
+
                 Log.d("UriUtils", uri.toString() + " parse failed. -> 1_1");
                 return null;
             }// end 1_1
@@ -193,6 +231,23 @@ public final class UriUtils {
                                        final String selection,
                                        final String[] selectionArgs,
                                        final String code) {
+        if ("com.google.android.apps.photos.content".equals(uri.getAuthority())) {
+            if (!TextUtils.isEmpty(uri.getLastPathSegment())) {
+                return new File(uri.getLastPathSegment());
+            }
+        } else if ("com.tencent.mtt.fileprovider".equals(uri.getAuthority())) {
+            String path = uri.getPath();
+            if (!TextUtils.isEmpty(path)) {
+                File fileDir = Environment.getExternalStorageDirectory();
+                return new File(fileDir, path.substring("/QQBrowser".length(), path.length()));
+            }
+        } else if ("com.huawei.hidisk.fileprovider".equals(uri.getAuthority())) {
+            String path = uri.getPath();
+            if (!TextUtils.isEmpty(path)) {
+                return new File(path.replace("/root", ""));
+            }
+        }
+
         final Cursor cursor = Utils.getApp().getContentResolver().query(
                 uri, new String[]{"_data"}, selection, selectionArgs, null);
         if (cursor == null) {
@@ -217,6 +272,40 @@ public final class UriUtils {
             return null;
         } finally {
             cursor.close();
+        }
+    }
+
+    private static File copyUri2Cache(Uri uri) {
+        Log.d("UriUtils", "copyUri2Cache() called");
+        InputStream is = uri2InputStream(uri);
+        File file = new File(Utils.getApp().getCacheDir(), "" + System.currentTimeMillis());
+        UtilsBridge.writeFileFromIS(file.getAbsolutePath(), is);
+        return file;
+    }
+
+    /**
+     * uri to input stream.
+     *
+     * @param uri The uri.
+     * @return the input stream
+     */
+    public static InputStream uri2InputStream(Uri uri) {
+        StringBuilder stringBuilder = new StringBuilder();
+        InputStream is = null;
+        try {
+            is = Utils.getApp().getContentResolver().openInputStream(uri);
+            return is;
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return null;
+        } finally {
+            if (is != null) {
+                try {
+                    is.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 }

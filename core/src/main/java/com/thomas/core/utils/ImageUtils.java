@@ -182,14 +182,21 @@ public final class ImageUtils {
         boolean willNotCacheDrawing = view.willNotCacheDrawing();
         view.setDrawingCacheEnabled(true);
         view.setWillNotCacheDrawing(false);
-        final Bitmap drawingCache = view.getDrawingCache();
+        Bitmap drawingCache = view.getDrawingCache();
         Bitmap bitmap;
         if (null == drawingCache) {
             view.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
                     View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
             view.layout(0, 0, view.getMeasuredWidth(), view.getMeasuredHeight());
             view.buildDrawingCache();
-            bitmap = Bitmap.createBitmap(view.getDrawingCache());
+            drawingCache = view.getDrawingCache();
+            if (drawingCache != null) {
+                bitmap = Bitmap.createBitmap(drawingCache);
+            } else {
+                bitmap = Bitmap.createBitmap(view.getMeasuredWidth(), view.getMeasuredHeight(), Bitmap.Config.ARGB_8888);
+                Canvas canvas = new Canvas(bitmap);
+                view.draw(canvas);
+            }
         } else {
             bitmap = Bitmap.createBitmap(drawingCache);
         }
@@ -278,8 +285,12 @@ public final class ImageUtils {
      */
     public static Bitmap getBitmap(final InputStream is, final int maxWidth, final int maxHeight) {
         if (is == null) return null;
-        byte[] bytes = UtilsBridge.inputStream2Bytes(is);
-        return getBitmap(bytes, 0, maxWidth, maxHeight);
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeStream(is, null, options);
+        options.inSampleSize = calculateInSampleSize(options, maxWidth, maxHeight);
+        options.inJustDecodeBounds = false;
+        return BitmapFactory.decodeStream(is, null, options);
     }
 
     /**
@@ -1297,15 +1308,15 @@ public final class ImageUtils {
         int wh = w * h;
         int div = radius + radius + 1;
 
-        int[] r = new int[wh];
-        int[] g = new int[wh];
-        int[] b = new int[wh];
+        int r[] = new int[wh];
+        int g[] = new int[wh];
+        int b[] = new int[wh];
         int rsum, gsum, bsum, x, y, i, p, yp, yi, yw;
-        int[] vmin = new int[Math.max(w, h)];
+        int vmin[] = new int[Math.max(w, h)];
 
         int divsum = (div + 1) >> 1;
         divsum *= divsum;
-        int[] dv = new int[256 * divsum];
+        int dv[] = new int[256 * divsum];
         for (i = 0; i < 256 * divsum; i++) {
             dv[i] = (i / divsum);
         }
@@ -1577,11 +1588,11 @@ public final class ImageUtils {
      * @return {@code true}: yes<br>{@code false}: no
      */
     public static boolean isImage(final String filePath) {
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
         try {
-            Bitmap bitmap = BitmapFactory.decodeFile(filePath, options);
-            return bitmap != null && options.outWidth != -1 && options.outHeight != -1;
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inJustDecodeBounds = true;
+            BitmapFactory.decodeFile(filePath, options);
+            return options.outWidth > 0 && options.outHeight > 0;
         } catch (Exception e) {
             return false;
         }

@@ -1,6 +1,7 @@
 package com.thomas.core.utils;
 
 import android.app.Activity;
+import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -23,8 +24,15 @@ import java.util.List;
 import static android.Manifest.permission.CALL_PHONE;
 
 class UtilsBridge {
-    static void init() {
-        UtilsActivityLifecycleImpl.INSTANCE.init();
+    static void init(Application app) {
+        UtilsActivityLifecycleImpl.INSTANCE.init(app);
+    }
+
+    static void unInit(Application app) {
+        UtilsActivityLifecycleImpl.INSTANCE.unInit(app);
+    }
+
+    static void preLoad() {
         preLoad(AdaptScreenUtils.getPreLoadRunnable());
     }
 
@@ -59,6 +67,10 @@ class UtilsBridge {
 
     static List<Activity> getActivityList() {
         return UtilsActivityLifecycleImpl.INSTANCE.getActivityList();
+    }
+
+    static Application getApplicationByReflect() {
+        return UtilsActivityLifecycleImpl.INSTANCE.getApplicationByReflect();
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -225,8 +237,8 @@ class UtilsBridge {
         return FileIOUtils.readFile2BytesByChannel(file);
     }
 
-    static boolean writeFileFromString(final String filePath, final String content) {
-        return FileIOUtils.writeFileFromString(filePath, content);
+    static boolean writeFileFromString(final String filePath, final String content, final boolean append) {
+        return FileIOUtils.writeFileFromString(filePath, content, append);
     }
 
     static boolean writeFileFromIS(final String filePath, final InputStream is) {
@@ -244,8 +256,8 @@ class UtilsBridge {
         return FileUtils.getFileByPath(filePath);
     }
 
-    static boolean deleteFilesInDir(final File dir) {
-        return FileUtils.deleteFilesInDir(dir);
+    static boolean deleteAllInDir(final File dir) {
+        return FileUtils.deleteAllInDir(dir);
     }
 
     static boolean createOrExistsFile(final File file) {
@@ -260,6 +272,13 @@ class UtilsBridge {
         return FileUtils.createFileByDeleteOldFile(file);
     }
 
+    static long getFsTotalSize(String path) {
+        return FileUtils.getFsTotalSize(path);
+    }
+
+    static long getFsAvailableSize(String path) {
+        return FileUtils.getFsAvailableSize(path);
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     // ImageUtils
@@ -372,6 +391,10 @@ class UtilsBridge {
     ///////////////////////////////////////////////////////////////////////////
     // SDCardUtils
     ///////////////////////////////////////////////////////////////////////////
+    static String getSDCardPathByEnvironment() {
+        return SDCardUtils.getSDCardPathByEnvironment();
+    }
+
     static boolean isSDCardEnableByEnvironment() {
         return SDCardUtils.isSDCardEnableByEnvironment();
     }
@@ -480,11 +503,5 @@ class UtilsBridge {
     ///////////////////////////////////////////////////////////////////////////
     static Uri file2Uri(final File file) {
         return UriUtils.file2Uri(file);
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // class
-    ///////////////////////////////////////////////////////////////////////////
-    static abstract class Task<T> extends ThreadUtils.SimpleTask<T> {
     }
 }
