@@ -7,10 +7,12 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Parcelable;
 import android.view.View;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.annotation.RequiresPermission;
 
 import org.json.JSONArray;
@@ -280,6 +282,7 @@ class UtilsBridge {
         return FileUtils.getFsAvailableSize(path);
     }
 
+
     ///////////////////////////////////////////////////////////////////////////
     // ImageUtils
     ///////////////////////////////////////////////////////////////////////////
@@ -374,6 +377,14 @@ class UtilsBridge {
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    // PermissionUtils
+    ///////////////////////////////////////////////////////////////////////////
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    static boolean isGrantedDrawOverlays() {
+        return PermissionUtils.isGrantedDrawOverlays();
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     // ProcessUtils
     ///////////////////////////////////////////////////////////////////////////
     static boolean isMainProcess() {
@@ -436,7 +447,7 @@ class UtilsBridge {
     // SpUtils
     ///////////////////////////////////////////////////////////////////////////
     static SPUtils getSpUtils4Utils() {
-        return SPUtils.getInstance("ThomasCore");
+        return SPUtils.getInstance("Utils");
     }
 
     ///////////////////////////////////////////////////////////////////////////
