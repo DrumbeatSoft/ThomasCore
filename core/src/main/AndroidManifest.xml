@@ -6,6 +6,11 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="m">
         <activity
+            android:name=".utils.UtilsTransActivity4MainProcess"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:theme="@style/ActivityTranslucent"
+            android:windowSoftInputMode="stateHidden|stateAlwaysHidden" />
+        <activity
             android:name=".utils.UtilsTransActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:multiprocess="true"
