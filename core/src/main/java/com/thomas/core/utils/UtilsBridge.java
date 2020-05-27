@@ -345,6 +345,10 @@ class UtilsBridge {
         return IntentUtils.getInstallAppIntent(file);
     }
 
+    static Intent getInstallAppIntent(final Uri uri) {
+        return IntentUtils.getInstallAppIntent(uri);
+    }
+
     static Intent getUninstallAppIntent(final String pkgName) {
         return IntentUtils.getUninstallAppIntent(pkgName);
     }
