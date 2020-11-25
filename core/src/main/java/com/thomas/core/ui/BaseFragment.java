@@ -87,11 +87,6 @@ public abstract class BaseFragment extends Fragment implements IBaseView {
         outState.putBoolean(STATE_SAVE_IS_HIDDEN, isHidden());
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-    }
-
     public void applyThomasClickListener(View... views) {
         ClickUtils.applySingleDebouncing(views, mClickListener);
 
