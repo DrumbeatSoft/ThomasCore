@@ -81,15 +81,6 @@ public abstract class BaseFragment extends Fragment implements IBaseView {
         doBusiness();
     }
 
-
-    @Override
-    public void onDestroyView() {
-        if (mContentView != null) {
-            ((ViewGroup) mContentView.getParent()).removeView(mContentView);
-        }
-        super.onDestroyView();
-    }
-
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
